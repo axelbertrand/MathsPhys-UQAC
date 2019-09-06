@@ -5,4 +5,4 @@ set(MY_EXE_SOURCES src/main.cpp)
 
 add_executable(MyExe ${MY_EXE_SOURCES}) # ${MY_EXE_HEADERS})
 
-target_link_libraries(MyExe PUBLIC glfw glad)
+target_link_libraries(MyExe PUBLIC glfw glad mathslib)

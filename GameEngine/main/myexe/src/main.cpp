@@ -1,6 +1,6 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-
+#include <vector3.hpp>
 #include <iostream>
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
@@ -12,6 +12,7 @@ const unsigned int SCR_HEIGHT = 600;
 
 int main()
 {
+	
 	// glfw: initialize and configure
 	// ------------------------------
 	glfwInit();
