@@ -1,6 +1,7 @@
 # Maths and Physique Game Engine Project
 
-One Paragraph of project description goes here
+Project made in 2019 for the "Mathématiques et Physique pour le jeu vidéo" class at UQAC.
+The project aim to realize a simple physical game engine and to use it in a simple game.
 
 ## Getting Started
 
@@ -11,7 +12,8 @@ These instructions will get you a copy of the project up and running on your loc
 What things you need to install the software and how to install them
 
 ```
-Give examples
+CMake
+A compiler
 ```
 
 ### Installing
