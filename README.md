@@ -11,80 +11,38 @@ These instructions will get you a copy of the project up and running on your loc
 
 What things you need to install the software and how to install them
 
-```
-CMake
-A compiler
-```
+- A compiler, for obvious reasons,
+- CMake, it will be used to generate the files for you environment.
+
+Note that the project has been made with Visual Studio so having it could help you running the project. If you use Visual Studio Code, don't forget to add the CMake and CMake Tools extensions.
+
 
 ### Installing
 
 A step by step series of examples that tell you how to get a development env running
 
-Say what the step will be
+1. Clone the project on your computer
 
-```
-Give the example
-```
+#### If you have Visual Studio or Visual Studio Code
 
-And repeat
+2. Right click on the project name --> Open in Visual Studio
+3. Once you're inside Visual Studio, generate everything. On VS19 Build --> BuildAll. You should see CMake working in the console output. When it's done you should see "Build All succeed" written in the consol output. 
+4. Run the program. On VS19 Debug --> Start. You should see the OpenGLWindow.
 
-```
-until finished
-```
+The process is similar on Visual Studio Code.
 
-End with an example of getting some data out of the system or using it for a little demo
+#### If you're not on Visual Studio
 
-## Running the tests
+2. Use CMake to generate the files for youre environment.
 
-Explain how to run the automated tests for this system
+The next steps depend on your environment but you should be able to:
 
-### Break down into end to end tests
-
-Explain what these tests test and why
-
-```
-Give an example
-```
-
-### And coding style tests
-
-Explain what these tests test and why
-
-```
-Give an example
-```
-
-## Deployment
-
-Add additional notes about how to deploy this on a live system
-
-## Built With
-
-* [Dropwizard](http://www.dropwizard.io/1.0.2/docs/) - The web framework used
-* [Maven](https://maven.apache.org/) - Dependency Management
-* [ROME](https://rometools.github.io/rome/) - Used to generate RSS Feeds
-
-## Contributing
-
-Please read [CONTRIBUTING.md](https://gist.github.com/PurpleBooth/b24679402957c63ec426) for details on our code of conduct, and the process for submitting pull requests to us.
-
-## Versioning
-
-We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://github.com/your/project/tags). 
+3. Compile the files CMake generated.
+4. Run the program.
 
 ## Authors
 
-* **Billie Thompson** - *Initial work* - [PurpleBooth](https://github.com/PurpleBooth)
-
-See also the list of [contributors](https://github.com/your/project/contributors) who participated in this project.
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
-
-## Acknowledgments
-
-* Hat tip to anyone whose code was used
-* Inspiration
-* etc
-
+* **PEREZ Benjamin**
+* **DURAND Quentin**
+* **BERTRAND Axel**
+* **DE CLERC Romain**
