@@ -3,9 +3,8 @@
 #include "..\include\vector3.hpp"
 namespace mathslib
 {
-
 	Vector3::Vector3() {};
-	Vector3::Vector3(float i, float j, float k)
+	Vector3::Vector3(double i, double j, double k)
 	{
 		x = i;
 		y = j;
@@ -37,7 +36,7 @@ namespace mathslib
 		res.z = v.z + z;
 		return res;
 	};
-	Vector3 Vector3::ScalarMultiplication(float const& k) const
+	Vector3 Vector3::ScalarMultiplication(double const& k) const
 	{
 		Vector3 res = Vector3(*this);
 		res.x *= k;
@@ -53,7 +52,7 @@ namespace mathslib
 		res.z = z * v.z;
 		return res;
 	};
-	float Vector3::ScalarProduct(Vector3 const& v) const
+	double Vector3::ScalarProduct(Vector3 const& v) const
 	{
 		return x * v.x + y * v.y + z * v.z;
 	};
@@ -73,7 +72,7 @@ namespace mathslib
 		return res;
 	};
 
-	Vector3 operator*(float k, Vector3 const& v)
+	Vector3 operator*(double k, Vector3 const& v)
 	{
 		Vector3 res;
 		res = v.ScalarMultiplication(k);
