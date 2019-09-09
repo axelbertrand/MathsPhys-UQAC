@@ -2,7 +2,6 @@ cmake_minimum_required(VERSION 3.10)
 
 set(MY_EXE_SOURCES src/main.cpp src/Particle.cpp)
 set(MY_EXE_HEADERS include/Particle.hpp)
-#set(MY_EXE_HEADERS include/main.hpp)
 
 add_executable(MyExe ${MY_EXE_SOURCES} ${MY_EXE_HEADERS})
 
