@@ -26,6 +26,9 @@ namespace mathslib
 		double ScalarProduct(Vector3 const& v )const;
 		Vector3 CrossProduct(Vector3 const& v) const;
 		std::string toString() const;
+		double getX() const { return x; };
+		double getY() const { return y; };
+		double getZ() const { return z; };
 	};
 }
 
