@@ -1,5 +1,6 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+#include "../include/Particle.hpp"
 
 #include <iostream>
 
@@ -14,43 +15,27 @@ const char* vertexShaderSource = "#version 330 core\n"
 "layout (location = 0) in vec3 aPos;\n"
 "void main()\n"
 "{\n"
-"   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
+"   float x = 2.0*(aPos.x/800.0)-1;\n"
+"   float y = 2.0*(aPos.y/600.0)-1;\n"
+"   float z = aPos.z;\n"
+"   gl_Position = vec4(x, y, z, 1.0);\n"
 "}\0";
+
 const char* fragmentShaderSource = "#version 330 core\n"
 "out vec4 FragColor;\n"
 "void main()\n"
 "{\n"
-"   FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
+"   FragColor = vec4(1.0f, 1.0f, 1.0f, 1.0f);\n"
 "}\n\0";
 
 int main()
 {
-	//tests vector3 & particle
-	/*Vector3 v = Vector3(1, 2, 3);
-	Vector3 v1 = Vector3(0, 4, 7);
-	Vector3 v2 = v + v1;
-	Vector3 v3 = v * 2.0;
-	Vector3 v4 = 2.0 * v;
-
-	std::cout << v2.toString() << std::endl;
-	std::cout << v3.toString() << std::endl;
-	std::cout << v4.toString() << std::endl;
-	Particle p = Particle(0.99, 1, Vector3(), Vector3(1, 2, 3), Vector3());
-	std::cout << p.toString() << std::endl;
-	p.integrate();
-	std::cout << p.toString() << std::endl;*/
-
-
 	// glfw: initialize and configure
 	// ------------------------------
 	glfwInit();
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-
-#ifdef __APPLE__
-	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE); // uncomment this statement to fix compilation on OS X
-#endif
 
 	// glfw window creation
 	// --------------------
@@ -59,7 +44,7 @@ int main()
 	{
 		std::cout << "Failed to create GLFW window" << std::endl;
 		glfwTerminate();
-		return -1;
+		return EXIT_FAILURE;
 	}
 	glfwMakeContextCurrent(window);
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
@@ -69,7 +54,7 @@ int main()
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
 	{
 		std::cout << "Failed to initialize GLAD" << std::endl;
-		return -1;
+		return EXIT_FAILURE;
 	}
 
 
@@ -116,10 +101,10 @@ int main()
 	// set up vertex data (and buffer(s)) and configure vertex attributes
 	// ------------------------------------------------------------------
 	float vertices[] = {
-		-0.8f, -0.8f, 0.0f,  // top right
-		-0.8f, -0.9f, 0.0f,  // bottom right
-		-0.9f, -0.9f, 0.0f,  // bottom left
-		-0.9f, -0.8f, 0.0f   // top left 
+	15.0, 15.0, 0.0f, // top right
+	15.0, 5.0, 0.0f,  // bottom right
+	5.0, 5.0, 0.0f,  // bottom left
+	5.0, 15.0, 0.0f   // top left
 	};
 	unsigned int indices[] = {  // note that we start from 0!
 		0, 1, 3,  // first Triangle
@@ -133,7 +118,7 @@ int main()
 	glBindVertexArray(VAO);
 
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STREAM_DRAW);
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
@@ -155,37 +140,43 @@ int main()
 	// uncomment this call to draw in wireframe polygons.
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
-	// render loop
+	// game loop
 	// -----------
-	unsigned i = 0;
+	Particle p = Particle(0.99, 1, Vector3(10, 10, 0), Vector3(1, 1, 1), Vector3());
 	while (!glfwWindowShouldClose(window))
 	{
-		i++;
 		// input
 		// -----
 		processInput(window);
 
+		// logic
+		p.integrate(Vector3(0,-15,0), 0.033333333);
+
 		// render
 		// ------
-		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+
+		// cleaning screen
+		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
 
-		// draw our first triangle
 		glUseProgram(shaderProgram);
 		glBindVertexArray(VAO); // seeing as we only have a single VAO there's no need to bind it every time, but we'll do so to keep things a bit more organized
-		if (i == 500)
-		{
-			vertices[0] += 0.1;
-			vertices[3] += 0.1;
-			vertices[6] += 0.1;
-			vertices[9] += 0.1;
-			glBindBuffer(GL_ARRAY_BUFFER, VBO);
-			glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-			i = 0;
-		}
-		//glDrawArrays(GL_TRIANGLES, 0, 6);
+		vertices[0] = p.getPosition().getX() + 5.0f;
+		vertices[1] = p.getPosition().getY() + 5.0f;
+		vertices[2] = 0.0f;
+		vertices[3] = p.getPosition().getX() + 5.0f;
+		vertices[4] = p.getPosition().getY() - 5.0f;
+		vertices[5] = 0.0f;
+		vertices[6] = p.getPosition().getX() - 5.0f;
+		vertices[7] = p.getPosition().getY() - 5.0f;
+		vertices[8] = 0.0f;
+		vertices[9] = p.getPosition().getX() - 5.0f;
+		vertices[10] = p.getPosition().getY() + 5.0f;
+		vertices[11] = 0.0f;
+		glBindBuffer(GL_ARRAY_BUFFER, VBO);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STREAM_DRAW);
+
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-		// glBindVertexArray(0); // no need to unbind it every time 
 
 		// glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
 		// -------------------------------------------------------------------------------
