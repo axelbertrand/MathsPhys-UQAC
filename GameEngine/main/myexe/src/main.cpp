@@ -142,7 +142,7 @@ int main()
 
 	// game loop
 	// -----------
-	Particle p = Particle(0.99, 1, Vector3(10, 10, 0), Vector3(1, 1, 1), Vector3());
+	Particle p = Particle(0.95, 1000, Vector3(10, 10, 0), Vector3(30, 100, 1), Vector3());
 	while (!glfwWindowShouldClose(window))
 	{
 		// input
@@ -150,7 +150,7 @@ int main()
 		processInput(window);
 
 		// logic
-		p.integrate(Vector3(0,-15,0), 0.033333333);
+		p.integrate(Vector3(0,-10,0), 0.01);
 
 		// render
 		// ------
@@ -193,7 +193,7 @@ int main()
 	// glfw: terminate, clearing all previously allocated GLFW resources.
 	// ------------------------------------------------------------------
 	glfwTerminate();
-	return 0;
+	return EXIT_SUCCESS;
 }
 
 // process all input: query GLFW whether relevant keys are pressed/released this frame and react accordingly
