@@ -1,15 +1,22 @@
 #include "..\include\GameEngine.hpp"
+#include <vector3.hpp>
 #include <iostream>
 #include <chrono>
 #include <algorithm>
 
+using namespace mathslib;
+
 GameEngine::GameEngine(const std::string& title, unsigned int windowWidth, unsigned int windowHeight)
-: WINDOW_WIDTH(windowWidth)
+: mParticles()
+, mWindow(nullptr)
+, WINDOW_WIDTH(windowWidth)
 , WINDOW_HEIGHT(windowHeight)
 {
 	initGlfw();
 	initWindow(title);
 	initGlad();
+
+	mParticles.push_back(Particle(0.99, 1, Vector3(), Vector3(1, 2, 3), Vector3()));
 }
 
 GameEngine::~GameEngine() {
@@ -36,9 +43,11 @@ void GameEngine::run() {
 
 		// update
 		// ------
+		std::cout << mParticles.at(0).toString() << std::endl;
 		auto start(std::chrono::system_clock::now());
 		update(t);
 		auto end(std::chrono::system_clock::now());
+		std::cout << mParticles.at(0).toString() << std::endl;
 
 		std::chrono::duration<double> elapsedSeconds = end - start;
 		t = elapsedSeconds.count();
@@ -73,8 +82,8 @@ void GameEngine::initWindow(const std::string& title)
 {
 	// glfw window creation
 	// --------------------
-	mWindow = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, title.c_str(), NULL, NULL);
-	if (mWindow == NULL)
+	mWindow = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, title.c_str(), nullptr, nullptr);
+	if (mWindow == nullptr)
 	{
 		std::cout << "Failed to create GLFW window" << std::endl;
 		glfwTerminate();
@@ -106,5 +115,7 @@ void GameEngine::processInput()
 }
 
 void GameEngine::update(double t) {
-	std::cout << "t = " << t << std::endl;
+	for_each(mParticles.begin(), mParticles.end(), [t](Particle& particle) {
+		particle.integrate(Vector3(), t);
+	});
 }

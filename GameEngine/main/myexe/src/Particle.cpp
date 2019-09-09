@@ -65,7 +65,7 @@ void Particle::setAcceleration(const Vector3& a)
 
 std::string Particle::toString() const
 {
-	return("dumping = " + std::to_string(dumping) + " ; inverseMass = " + std::to_string(inverseMass) + " ; position = (" + position.toString() + ") ; speed = (" + speed.toString() + ") ; acceleration = (" + acceleration.toString() +")");
+	return("Particle(dumping = " + std::to_string(dumping) + " ; inverseMass = " + std::to_string(inverseMass) + " ; position = " + position.toString() + " ; speed = " + speed.toString() + " ; acceleration = " + acceleration.toString() +")");
 }
 
 Particle::~Particle()
