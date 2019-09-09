@@ -2,6 +2,7 @@
 #include <GLFW/glfw3.h>
 #include <vector3.hpp>
 #include <iostream>
+#include "../include/Particle.hpp"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow* window);
@@ -10,9 +11,25 @@ void processInput(GLFWwindow* window);
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
 
+
 int main()
 {
-	
+	//tests vector3 & particle
+	/*Vector3 v = Vector3(1, 2, 3);
+	Vector3 v1 = Vector3(0, 4, 7);
+	Vector3 v2 = v + v1;
+	Vector3 v3 = v * 2.0;
+	Vector3 v4 = 2.0 * v;
+
+	std::cout << v2.toString() << std::endl;
+	std::cout << v3.toString() << std::endl;
+	std::cout << v4.toString() << std::endl;
+	Particle p = Particle(0.99, 1, Vector3(), Vector3(1, 2, 3), Vector3());
+	std::cout<<p.toString()<<std::endl;
+	p.integrate();
+	std::cout << p.toString() << std::endl;
+	*/
+
 	// glfw: initialize and configure
 	// ------------------------------
 	glfwInit();
