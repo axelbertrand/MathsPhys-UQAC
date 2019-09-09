@@ -1,5 +1,4 @@
 #include <iostream>
-#include <string>
 #include "..\include\vector3.hpp"
 namespace mathslib
 {
@@ -16,18 +15,68 @@ namespace mathslib
 		y = v.y;
 		z = v.z;
 	};
-	void Vector3::operator+=(const Vector3& v)
+	void Vector3::operator+=(const Vector3& v) 
 	{
 		x += v.x;
 		y += v.y;
 		z += v.z;
 	};
-	void Vector3::operator-=(Vector3 const& v)
+	void Vector3::operator-=(Vector3 const& v) 
 	{
 		x -= v.x;
 		y -= v.y;
 		z -= v.z;
 	};
+
+
+	/*Vector3 operator+(Vector3 const& u, Vector3 const& v)
+	{
+		Vector3 res;
+		res = u.VectorAddition(v);
+		return res;
+	};*/
+
+	Vector3 Vector3::operator+(Vector3 const& v) const
+	{
+		Vector3 res;
+		res = this->VectorAddition(v);
+		return res;
+	};
+
+	Vector3 Vector3::operator-(Vector3 const& v) const
+	{
+		Vector3 res;
+		res.x = x - v.x;
+		res.y = y - v.y;
+		res.z = z - v.z;
+		return res;
+	};
+	/*double operator*(Vector3 const& u, Vector3 const& v)
+	{
+		return u.ScalarProduct(v);
+	}*/
+
+	double Vector3::operator*(Vector3 const& v) const
+	{
+		return this->ScalarProduct(v);
+	};
+
+	Vector3 Vector3::operator*(double k) const
+	{
+		Vector3 res;
+		res = this->ScalarMultiplication(k);
+		return res;
+	};
+
+	/*Vector3 operator^(Vector3 const& u, Vector3 const& v)
+	{
+		return u.CrossProduct(v);
+	}*/
+
+	Vector3 Vector3::operator^(Vector3 const& v) const
+	{
+		return this->CrossProduct(v);
+	}
 	Vector3 Vector3::VectorAddition(Vector3 const& v) const
 	{
 		Vector3 res;
@@ -65,27 +114,9 @@ namespace mathslib
 		return res;
 	};
 
-	Vector3 operator+(Vector3 const& u, Vector3 const& v)
+	std::string Vector3::toString() const
 	{
-		Vector3 res;
-		res = u.VectorAddition(v);
-		return res;
-	};
-
-	Vector3 operator*(double k, Vector3 const& v)
-	{
-		Vector3 res;
-		res = v.ScalarMultiplication(k);
-		return res;
-	};
-
-	float operator*(Vector3 const& u, Vector3 const& v)
-	{
-		return u.ScalarProduct(v);
-	}
-
-	Vector3 operator^(Vector3 const& u, Vector3 const& v)
-	{
-		return u.CrossProduct(v);
+		return("x = " + std::to_string(x) + " ; y = " + std::to_string(y) + " ; z = " + std::to_string(z));
 	}
 }
+
