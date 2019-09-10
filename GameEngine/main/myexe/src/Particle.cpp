@@ -23,9 +23,9 @@ Particle::Particle(Particle const& p)
 
 void Particle::integrate(const Vector3& newAcceleration, double frameTime)
 {
-	position += speed.ScalarMultiplication(frameTime);
-	speed = speed.ScalarMultiplication(pow(dumping, frameTime)).VectorAddition(acceleration.ScalarMultiplication(frameTime));
-	this->acceleration = newAcceleration;
+	position += speed * frameTime;
+	speed = speed * pow(dumping, frameTime) + acceleration * frameTime;
+	acceleration = newAcceleration;
 }
 
 double Particle::getInverseMass() const
