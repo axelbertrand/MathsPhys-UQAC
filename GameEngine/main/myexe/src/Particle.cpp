@@ -20,6 +20,17 @@ Particle::Particle(Particle const& p)
 	acceleration = Vector3(p.acceleration);
 }
 
+bool Particle::isVisible(unsigned int xMax, unsigned int yMax) const
+{
+	float x = getPosition().getX();
+	float y = getPosition().getY();
+	if (x - 5 >= xMax || x + 5 <= 0 || y - 5 >= yMax || y + 5 <= 0)
+	{
+		return false;
+	}
+	return true;
+}
+
 
 void Particle::integrate(const Vector3& newAcceleration, double frameTime)
 {
