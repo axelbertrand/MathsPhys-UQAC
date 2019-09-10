@@ -16,6 +16,7 @@ public:
 	std::string toString() const;
 	virtual ~Particle();
 
+	bool isVisible(unsigned int xMax, unsigned int yMax) const;
 
 private:
 	double dumping;
