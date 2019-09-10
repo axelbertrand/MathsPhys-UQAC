@@ -19,6 +19,7 @@ namespace mathslib
 		Vector3 operator-(const Vector3& v) const;
 		Vector3 operator*(double k) const;
 		double operator*(const Vector3& v) const;
+		Vector3 operator/(double k) const;
 		Vector3 operator^(const Vector3& v) const;
 		Vector3 VectorAddition(Vector3 const& v) const;
 		Vector3 ScalarMultiplication(double const& k) const;
@@ -29,6 +30,9 @@ namespace mathslib
 		double getX() const { return x; };
 		double getY() const { return y; };
 		double getZ() const { return z; };
+		double getNorm() const;
+		double getSquaredNorm() const;
+		Vector3 getNormalizedVector() const;
 	};
 }
 
