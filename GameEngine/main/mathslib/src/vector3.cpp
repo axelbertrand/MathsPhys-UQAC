@@ -79,7 +79,7 @@ namespace mathslib
 		return res;
 	};
 
-	float operator*(Vector3 const& u, Vector3 const& v)
+	double operator*(Vector3 const& u, Vector3 const& v)
 	{
 		return u.ScalarProduct(v);
 	}
