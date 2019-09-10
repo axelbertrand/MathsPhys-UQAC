@@ -1,11 +1,17 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+#include <tuple>
+#include<vector>
+#include <iostream>
+#include <algorithm> 
+
 #include "../include/Particle.hpp"
 
-#include <iostream>
+
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
-void processInput(GLFWwindow* window);
+std::tuple<unsigned int, unsigned int, unsigned int> createVAO(float x, float y);
+void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
 
 // settings
 const unsigned int SCR_WIDTH = 800;
@@ -28,6 +34,8 @@ const char* fragmentShaderSource = "#version 330 core\n"
 "   FragColor = vec4(1.0f, 1.0f, 1.0f, 1.0f);\n"
 "}\n\0";
 
+static std::vector<Particle> particles;
+
 int main()
 {
 	// glfw: initialize and configure
@@ -48,6 +56,7 @@ int main()
 	}
 	glfwMakeContextCurrent(window);
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+	glfwSetKeyCallback(window, keyCallback);
 
 	// glad: load all OpenGL function pointers
 	// ---------------------------------------
@@ -98,13 +107,132 @@ int main()
 	glDeleteShader(vertexShader);
 	glDeleteShader(fragmentShader);
 
+	// game loop
+	// -----------
+	while (!glfwWindowShouldClose(window))
+	{
+		// input
+		// -----
+		//processInput(window, particles);
+
+		// logic
+		/*for (auto& particle : particles) {
+			particle.integrate(Vector3(0,-10,0), 0.01);
+			if (!particle.isVisible(SCR_WIDTH, SCR_HEIGHT))
+			{
+				particles.erase(particle);
+			}
+		}*/
+		auto particle = std::begin(particles);
+
+		while (particle != std::end(particles)) 
+		{
+			particle->integrate(Vector3(0, -10, 0), 0.01);
+			if (!particle->isVisible(SCR_WIDTH, SCR_HEIGHT))
+			{
+				particle = particles.erase(particle);
+			}
+			else
+			{
+				++particle;
+			}
+
+		}
+
+		// render
+		// ------
+
+		// cleaning screen
+		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+		glClear(GL_COLOR_BUFFER_BIT);
+
+		glUseProgram(shaderProgram);
+		for (auto& particle : particles) {
+			std::tuple<unsigned int, unsigned int, unsigned int> bufferIDs = createVAO(particle.getPosition().getX(), particle.getPosition().getY());
+			glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+			glDeleteVertexArrays(1, &std::get<0>(bufferIDs));
+			glDeleteBuffers(1, &std::get<1>(bufferIDs));
+			glDeleteBuffers(1, &std::get<2>(bufferIDs));
+		}
+
+		// glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
+		// -------------------------------------------------------------------------------
+		glfwSwapBuffers(window);
+		glfwPollEvents();
+	}
+
+	// glfw: terminate, clearing all previously allocated GLFW resources.
+	// ------------------------------------------------------------------
+	glfwTerminate();
+	return EXIT_SUCCESS;
+}
+
+// process all input: query GLFW whether relevant keys are pressed/released this frame and react accordingly
+// ---------------------------------------------------------------------------------------------------------
+void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
+{
+	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
+	{
+		glfwSetWindowShouldClose(window, true);
+	}
+	else if (key == GLFW_KEY_Q && action == GLFW_PRESS)
+	{
+		particles.push_back(Particle(0.90, 50, Vector3(10, 10, 0), Vector3(100, 50, 1), Vector3()));
+	}
+	else if (key == GLFW_KEY_W && action == GLFW_PRESS)
+	{
+		particles.push_back(Particle(0.99, 10, Vector3(10, 400, 0), Vector3(100, 0, 1), Vector3()));
+	}
+	else if (key == GLFW_KEY_E && action == GLFW_PRESS)
+	{
+		particles.push_back(Particle(0.95, 1, Vector3(10, 10, 0), Vector3(100, 100, 1), Vector3()));
+	}
+
+}
+
+// glfw: whenever the window size changed (by OS or user resize) this callback function executes
+// ---------------------------------------------------------------------------------------------
+void framebuffer_size_callback(GLFWwindow* window, int width, int height)
+{
+	// make sure the viewport matches the new window dimensions; note that width and 
+	// height will be significantly larger than specified on retina displays.
+	glViewport(0, 0, width, height);
+}
+
+std::tuple<unsigned int, unsigned int, unsigned int> createVAO(float x, float y)
+{
 	// set up vertex data (and buffer(s)) and configure vertex attributes
 	// ------------------------------------------------------------------
+	float topX = x + 5;
+	if (topX > SCR_WIDTH)
+	{
+		topX = SCR_WIDTH;
+	}
+
+	float bottomX = x - 5;
+	if (bottomX < 0)
+	{
+		bottomX = 0;
+	}
+
+
+	float topY = y + 5;
+	if (topY > SCR_HEIGHT)
+	{
+		topY = SCR_HEIGHT;
+	}
+
+	float bottomY = y - 5;
+	if (bottomY < 0)
+	{
+		bottomY = 0;
+	}
+
 	float vertices[] = {
-	15.0, 15.0, 0.0f, // top right
-	15.0, 5.0, 0.0f,  // bottom right
-	5.0, 5.0, 0.0f,  // bottom left
-	5.0, 15.0, 0.0f   // top left
+	topX, topY, 0.0f, // top right
+	topX, bottomY, 0.0f,  // bottom right
+	bottomX, bottomY, 0.0f,  // bottom left
+	bottomX, topY, 0.0f   // top left
 	};
 	unsigned int indices[] = {  // note that we start from 0!
 		0, 1, 3,  // first Triangle
@@ -129,87 +257,12 @@ int main()
 	// note that this is allowed, the call to glVertexAttribPointer registered VBO as the vertex attribute's bound vertex buffer object so afterwards we can safely unbind
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-	// remember: do NOT unbind the EBO while a VAO is active as the bound element buffer object IS stored in the VAO; keep the EBO bound.
-	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-
 	// You can unbind the VAO afterwards so other VAO calls won't accidentally modify this VAO, but this rarely happens. Modifying other
 	// VAOs requires a call to glBindVertexArray anyways so we generally don't unbind VAOs (nor VBOs) when it's not directly necessary.
-	glBindVertexArray(0);
+	//glBindVertexArray(0);
 
-
-	// uncomment this call to draw in wireframe polygons.
-	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-
-	// game loop
-	// -----------
-	Particle p = Particle(0.95, 1000, Vector3(10, 10, 0), Vector3(30, 100, 1), Vector3());
-	while (!glfwWindowShouldClose(window))
-	{
-		// input
-		// -----
-		processInput(window);
-
-		// logic
-		p.integrate(Vector3(0,-10,0), 0.01);
-
-		// render
-		// ------
-
-		// cleaning screen
-		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT);
-
-		glUseProgram(shaderProgram);
-		glBindVertexArray(VAO); // seeing as we only have a single VAO there's no need to bind it every time, but we'll do so to keep things a bit more organized
-		vertices[0] = p.getPosition().getX() + 5.0f;
-		vertices[1] = p.getPosition().getY() + 5.0f;
-		vertices[2] = 0.0f;
-		vertices[3] = p.getPosition().getX() + 5.0f;
-		vertices[4] = p.getPosition().getY() - 5.0f;
-		vertices[5] = 0.0f;
-		vertices[6] = p.getPosition().getX() - 5.0f;
-		vertices[7] = p.getPosition().getY() - 5.0f;
-		vertices[8] = 0.0f;
-		vertices[9] = p.getPosition().getX() - 5.0f;
-		vertices[10] = p.getPosition().getY() + 5.0f;
-		vertices[11] = 0.0f;
-		glBindBuffer(GL_ARRAY_BUFFER, VBO);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STREAM_DRAW);
-
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-
-		// glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
-		// -------------------------------------------------------------------------------
-		glfwSwapBuffers(window);
-		glfwPollEvents();
-	}
-
-	// optional: de-allocate all resources once they've outlived their purpose:
-	// ------------------------------------------------------------------------
-	glDeleteVertexArrays(1, &VAO);
-	glDeleteBuffers(1, &VBO);
-	glDeleteBuffers(1, &EBO);
-
-	// glfw: terminate, clearing all previously allocated GLFW resources.
-	// ------------------------------------------------------------------
-	glfwTerminate();
-	return EXIT_SUCCESS;
+	return { VAO, VBO, EBO };
 }
 
-// process all input: query GLFW whether relevant keys are pressed/released this frame and react accordingly
-// ---------------------------------------------------------------------------------------------------------
-void processInput(GLFWwindow* window)
-{
-	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-		glfwSetWindowShouldClose(window, true);
-}
 
-// glfw: whenever the window size changed (by OS or user resize) this callback function executes
-// ---------------------------------------------------------------------------------------------
-void framebuffer_size_callback(GLFWwindow* window, int width, int height)
-{
-	// make sure the viewport matches the new window dimensions; note that width and 
-	// height will be significantly larger than specified on retina displays.
-	glViewport(0, 0, width, height);
-}
 
