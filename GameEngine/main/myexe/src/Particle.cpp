@@ -17,6 +17,7 @@ Particle::~Particle()
 {
 }
 
+//indicates whether or not a particle is visible or not on the screen
 bool Particle::isVisible(unsigned int xMax, unsigned int yMax) const
 {
 	double x = getPosition().getX();
@@ -28,7 +29,7 @@ bool Particle::isVisible(unsigned int xMax, unsigned int yMax) const
 	return true;
 }
 
-
+// Updates position, speed, acceleration using Newton laws
 void Particle::integrate(const  mathslib::Vector3& newAcceleration, double frameTime)
 {
 	m_position += m_speed * frameTime;

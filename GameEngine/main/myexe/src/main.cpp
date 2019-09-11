@@ -1,8 +1,9 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <tuple>
-#include<vector>
+#include <vector>
 #include <iostream>
+#include <chrono>
 #include <algorithm> 
 
 #include "../include/Particle.hpp"
@@ -92,8 +93,11 @@ int main()
 
 	// game loop
 	// -----------
+	mathslib::Vector3 gravity = mathslib::Vector3(0, -20, 0);
+	double frametime = 0.033333;//first frame considered at 30fps
 	while (!glfwWindowShouldClose(window))
 	{
+		auto start(std::chrono::system_clock::now());
 		// input
 		// -----
 
@@ -101,7 +105,7 @@ int main()
 		auto particle = std::begin(particles);
 		while (particle != std::end(particles)) 
 		{
-			particle->integrate(mathslib::Vector3(0, -10, 0), 0.01);
+			particle->integrate(gravity, frametime);//use last frame time for integration
 			if (!particle->isVisible(SCR_WIDTH, SCR_HEIGHT))
 			{
 				particle = particles.erase(particle);
@@ -134,6 +138,10 @@ int main()
 		// -------------------------------------------------------------------------------
 		glfwSwapBuffers(window);
 		glfwPollEvents();
+
+		auto end(std::chrono::system_clock::now());
+		std::chrono::duration<double> elapsedSeconds = end - start;
+		frametime = elapsedSeconds.count();//update frametime using last frame
 	}
 
 	// glfw: terminate, clearing all previously allocated GLFW resources.
@@ -152,15 +160,15 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
 	}
 	else if (key == GLFW_KEY_Q && action == GLFW_PRESS)
 	{
-		particles.push_back(Particle(0.90, 50, mathslib::Vector3(10, 10, 0), mathslib::Vector3(100, 50, 1), mathslib::Vector3()));
+		particles.push_back(Particle(0.90, 50, mathslib::Vector3(10, 10, 0), mathslib::Vector3(100, 50, 0), mathslib::Vector3()));
 	}
 	else if (key == GLFW_KEY_W && action == GLFW_PRESS)
 	{
-		particles.push_back(Particle(0.99, 10, mathslib::Vector3(10, 400, 0), mathslib::Vector3(100, 0, 1), mathslib::Vector3()));
+		particles.push_back(Particle(0.99, 10, mathslib::Vector3(10, 400, 0), mathslib::Vector3(100, 0, 0), mathslib::Vector3()));
 	}
 	else if (key == GLFW_KEY_E && action == GLFW_PRESS)
 	{
-		particles.push_back(Particle(0.95, 1, mathslib::Vector3(10, 10, 0), mathslib::Vector3(100, 100, 1), mathslib::Vector3()));
+		particles.push_back(Particle(0.95, 1, mathslib::Vector3(10, 10, 0), mathslib::Vector3(100, 100, 0), mathslib::Vector3()));
 	}
 
 }
