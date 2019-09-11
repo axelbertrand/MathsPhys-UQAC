@@ -40,6 +40,10 @@ The next steps depend on your environment but you should be able to:
 3. Compile the CMake generated files.
 4. Run the program.
 
+### Using
+
+While the program is running, press A, Z or E keys to send particles with different initial position and speed. You can send multiple particles in a row to see their trajectories.
+
 ## Authors
 
 
@@ -51,4 +55,4 @@ The next steps depend on your environment but you should be able to:
 ## Links
 The github project : https://github.com/BJPerez/MathsPhy-UQAC
 
-Th OpenGl tutorial: https://learnopengl.com/
+The OpenGl tutorial: https://learnopengl.com/
