@@ -1,7 +1,6 @@
 #include <iostream>
 #include <math.h>
 #include "..\include\vector3.hpp"
-#include <iostream>//to delete 
 namespace mathslib
 {
 	Vector3::Vector3() {};
@@ -130,6 +129,7 @@ namespace mathslib
 		res.setZ(m_z * anotherVector.getZ());
 		return res;
 	}
+	
 
 	double Vector3::getNorm() const
 	{
@@ -141,14 +141,17 @@ namespace mathslib
 		return (m_x * m_x + m_y * m_y + m_z * m_z);
 	}
 
+	//returns a vector with the same direction but with a norm equal to 1
 	Vector3 Vector3::getNormalizedVector() const
 	{
-		return (*this / (this->getNorm()));//be careful here
+		double norm = this->getNorm();
+		if(norm != 0) return (*this / norm);
+		else return Vector3();	//return (0, 0, 0) Vector if input Vector is (0, 0, 0)
 	}
 
 	std::string Vector3::toString() const
 	{
-		return("x = " + std::to_string(m_x) + " ; y = " + std::to_string(m_y) + " ; z = " + std::to_string(m_z));
+		return("(x = " + std::to_string(m_x) + " ; y = " + std::to_string(m_y) + " ; z = " + std::to_string(m_z)+")");
 	}
 
 	
