@@ -49,6 +49,6 @@ The next steps depend on your environment but you should be able to:
 * **PEREZ Benjamin**
 
 ## Links
-The project github: https://github.com/BJPerez/MathsPhy-UQAC
+The github project : https://github.com/BJPerez/MathsPhy-UQAC
 
 Th OpenGl tutorial: https://learnopengl.com/
