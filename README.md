@@ -27,7 +27,7 @@ A step by step series of examples that tell you how to get a development environ
 
 2. Right click on the folder with the project name --> Open in Visual Studio
 3. Once you're inside Visual Studio, generate everything. On VS19 Build --> BuildAll. You should see CMake working in the console output. When it's done you should see "Build All succeed" written in the consol output. 
-4. Run the program. On VS19 Debug --> Start. You should see the OpenGLWindow.
+4. Run the program. On VS19 Debug --> Start. You should see the OpenGLWindow. If Start button is disabled, check if the correct item is selected in the "Select Startup Item" drop-down list (on the top of the screen, on the right of the green arrow). The selected item should be MyExe.exe.
 
 The process is similar on Visual Studio Code.
 
@@ -47,3 +47,7 @@ The next steps depend on your environment but you should be able to:
 * **DE CLERCQ Romain**
 * **DURAND Quentin**
 * **PEREZ Benjamin**
+
+## Links
+The project github: https://github.com/BJPerez/MathsPhy-UQAC
+Th OpenGl tutorial: https://learnopengl.com/
