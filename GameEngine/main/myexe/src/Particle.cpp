@@ -2,28 +2,25 @@
 #include <math.h>
 
 
-Particle::Particle(double dumping, double inverseMass,  Vector3 position,  Vector3 speed,  Vector3 acceleration)
+Particle::Particle(double dumping, double inverseMass,  mathslib::Vector3 position, mathslib::Vector3 speed, mathslib::Vector3 acceleration):
+	m_dumping(dumping), m_inverseMass(inverseMass), m_position(position), m_speed(speed), m_acceleration(acceleration)
 {
-	this->dumping = dumping;
-	this->inverseMass = inverseMass;
-	this->position = position;
-	this->speed = speed;
-	this->acceleration = acceleration;
 }
 
-Particle::Particle(Particle const& p)
+Particle::Particle(Particle const& anotherParticle):
+	m_dumping(anotherParticle.getDumping()), m_inverseMass(anotherParticle.getInverseMass()), m_position(mathslib::Vector3(anotherParticle.getPosition())),
+	m_speed(mathslib::Vector3(anotherParticle.getSpeed())), m_acceleration(mathslib::Vector3(anotherParticle.getAcceleration()))
 {
-	dumping = p.dumping;
-	inverseMass = p.inverseMass;
-	position = Vector3(p.position);
-	speed = Vector3(p.speed);
-	acceleration = Vector3(p.acceleration);
+}
+
+Particle::~Particle()
+{
 }
 
 bool Particle::isVisible(unsigned int xMax, unsigned int yMax) const
 {
-	float x = getPosition().getX();
-	float y = getPosition().getY();
+	double x = getPosition().getX();
+	double y = getPosition().getY();
 	if (x - 5 >= xMax || x + 5 <= 0 || y - 5 >= yMax || y + 5 <= 0)
 	{
 		return false;
@@ -32,53 +29,44 @@ bool Particle::isVisible(unsigned int xMax, unsigned int yMax) const
 }
 
 
-void Particle::integrate(const Vector3& newAcceleration, double frameTime)
+void Particle::integrate(const  mathslib::Vector3& newAcceleration, double frameTime)
 {
-	position += speed * frameTime;
-	speed = speed * pow(dumping, frameTime) + acceleration * frameTime;
-	acceleration = newAcceleration;
+	m_position += m_speed * frameTime;
+	m_speed = m_speed * pow(m_dumping, frameTime) + m_acceleration * frameTime;
+	m_acceleration = newAcceleration;
 }
 
 double Particle::getInverseMass() const
 {
-	return inverseMass;
+	return m_inverseMass;
 }
 
-Vector3 Particle::getPosition() const
+mathslib::Vector3 Particle::getPosition() const
 {
-	return position;
+	return m_position;
 }
 
-Vector3 Particle::getSpeed() const
+mathslib::Vector3 Particle::getSpeed() const
 {
-	return speed;
+	return m_speed;
 }
 
-Vector3 Particle::getAcceleration() const
+double Particle::getDumping() const
 {
-	return acceleration;
+	return m_dumping;
 }
 
-void Particle::setPosition(const Vector3& p) 
+mathslib::Vector3 Particle::getAcceleration() const
 {
-	position = p;
-}
-
-void Particle::setSpeed(const Vector3& s) 
-{
-	speed = s;
-}
-
-void Particle::setAcceleration(const Vector3& a)
-{
-	acceleration = a;
+	return m_acceleration;
 }
 
 std::string Particle::toString() const
 {
-	return("dumping = " + std::to_string(dumping) + " ; inverseMass = " + std::to_string(inverseMass) + " ; position = (" + position.toString() + ") ; speed = (" + speed.toString() + ") ; acceleration = (" + acceleration.toString() +")");
-}
-
-Particle::~Particle()
-{
+	std::string result = "dumping = " + std::to_string(m_dumping) + "\n";
+	result += "inverseMass = " + std::to_string(m_inverseMass) + "\n";
+	result += "position = (" + m_position.toString() + ")\n";
+	result += "speed = (" + m_speed.toString() + ")\n";
+	result += "acceleration = (" + m_acceleration.toString() + ")\n";
+	return(result);
 }

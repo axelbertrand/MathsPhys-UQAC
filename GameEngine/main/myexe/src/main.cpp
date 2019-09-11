@@ -6,34 +6,18 @@
 #include <algorithm> 
 
 #include "../include/Particle.hpp"
+#include "../include/ShaderSources.hpp"
 
-
-
+// function declarations
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
-std::tuple<unsigned int, unsigned int, unsigned int> createVAO(float x, float y);
+std::tuple<unsigned int, unsigned int, unsigned int> createVAO(double x, double y);
 void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
 
 // settings
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
 
-const char* vertexShaderSource = "#version 330 core\n"
-"layout (location = 0) in vec3 aPos;\n"
-"void main()\n"
-"{\n"
-"   float x = 2.0*(aPos.x/800.0)-1;\n"
-"   float y = 2.0*(aPos.y/600.0)-1;\n"
-"   float z = aPos.z;\n"
-"   gl_Position = vec4(x, y, z, 1.0);\n"
-"}\0";
-
-const char* fragmentShaderSource = "#version 330 core\n"
-"out vec4 FragColor;\n"
-"void main()\n"
-"{\n"
-"   FragColor = vec4(1.0f, 1.0f, 1.0f, 1.0f);\n"
-"}\n\0";
-
+// global variables
 static std::vector<Particle> particles;
 
 int main()
@@ -47,7 +31,7 @@ int main()
 
 	// glfw window creation
 	// --------------------
-	GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "LearnOpenGL", NULL, NULL);
+	GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "GameEngine Demo", NULL, NULL);
 	if (window == NULL)
 	{
 		std::cout << "Failed to create GLFW window" << std::endl;
@@ -65,7 +49,6 @@ int main()
 		std::cout << "Failed to initialize GLAD" << std::endl;
 		return EXIT_FAILURE;
 	}
-
 
 	// build and compile our shader program
 	// ------------------------------------
@@ -113,21 +96,12 @@ int main()
 	{
 		// input
 		// -----
-		//processInput(window, particles);
 
 		// logic
-		/*for (auto& particle : particles) {
-			particle.integrate(Vector3(0,-10,0), 0.01);
-			if (!particle.isVisible(SCR_WIDTH, SCR_HEIGHT))
-			{
-				particles.erase(particle);
-			}
-		}*/
 		auto particle = std::begin(particles);
-
 		while (particle != std::end(particles)) 
 		{
-			particle->integrate(Vector3(0, -10, 0), 0.01);
+			particle->integrate(mathslib::Vector3(0, -10, 0), 0.01);
 			if (!particle->isVisible(SCR_WIDTH, SCR_HEIGHT))
 			{
 				particle = particles.erase(particle);
@@ -146,6 +120,7 @@ int main()
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
 
+		// drawing particles
 		glUseProgram(shaderProgram);
 		for (auto& particle : particles) {
 			std::tuple<unsigned int, unsigned int, unsigned int> bufferIDs = createVAO(particle.getPosition().getX(), particle.getPosition().getY());
@@ -167,7 +142,7 @@ int main()
 	return EXIT_SUCCESS;
 }
 
-// process all input: query GLFW whether relevant keys are pressed/released this frame and react accordingly
+// process all input: query GLFW whether relevant keys are pressed/released and react accordingly
 // ---------------------------------------------------------------------------------------------------------
 void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
@@ -177,15 +152,15 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
 	}
 	else if (key == GLFW_KEY_Q && action == GLFW_PRESS)
 	{
-		particles.push_back(Particle(0.90, 50, Vector3(10, 10, 0), Vector3(100, 50, 1), Vector3()));
+		particles.push_back(Particle(0.90, 50, mathslib::Vector3(10, 10, 0), mathslib::Vector3(100, 50, 1), mathslib::Vector3()));
 	}
 	else if (key == GLFW_KEY_W && action == GLFW_PRESS)
 	{
-		particles.push_back(Particle(0.99, 10, Vector3(10, 400, 0), Vector3(100, 0, 1), Vector3()));
+		particles.push_back(Particle(0.99, 10, mathslib::Vector3(10, 400, 0), mathslib::Vector3(100, 0, 1), mathslib::Vector3()));
 	}
 	else if (key == GLFW_KEY_E && action == GLFW_PRESS)
 	{
-		particles.push_back(Particle(0.95, 1, Vector3(10, 10, 0), Vector3(100, 100, 1), Vector3()));
+		particles.push_back(Particle(0.95, 1, mathslib::Vector3(10, 10, 0), mathslib::Vector3(100, 100, 1), mathslib::Vector3()));
 	}
 
 }
@@ -199,45 +174,48 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 	glViewport(0, 0, width, height);
 }
 
-std::tuple<unsigned int, unsigned int, unsigned int> createVAO(float x, float y)
+// create buffers to contains graphical data
+std::tuple<unsigned int, unsigned int, unsigned int> createVAO(double x, double y)
 {
-	// set up vertex data (and buffer(s)) and configure vertex attributes
-	// ------------------------------------------------------------------
-	float topX = x + 5;
+	double topX = x + 5;
 	if (topX > SCR_WIDTH)
 	{
 		topX = SCR_WIDTH;
 	}
 
-	float bottomX = x - 5;
+	double bottomX = x - 5;
 	if (bottomX < 0)
 	{
 		bottomX = 0;
 	}
 
 
-	float topY = y + 5;
+	double topY = y + 5;
 	if (topY > SCR_HEIGHT)
 	{
 		topY = SCR_HEIGHT;
 	}
 
-	float bottomY = y - 5;
+	double bottomY = y - 5;
 	if (bottomY < 0)
 	{
 		bottomY = 0;
 	}
 
-	float vertices[] = {
+	// set up vertex data (and buffer(s)) and configure vertex attributes
+	// ------------------------------------------------------------------
+	double vertices[] = { 
 	topX, topY, 0.0f, // top right
 	topX, bottomY, 0.0f,  // bottom right
 	bottomX, bottomY, 0.0f,  // bottom left
 	bottomX, topY, 0.0f   // top left
 	};
+
 	unsigned int indices[] = {  // note that we start from 0!
 		0, 1, 3,  // first Triangle
 		1, 2, 3   // second Triangle
 	};
+
 	unsigned int VBO, VAO, EBO;
 	glGenVertexArrays(1, &VAO);
 	glGenBuffers(1, &VBO);
@@ -251,15 +229,10 @@ std::tuple<unsigned int, unsigned int, unsigned int> createVAO(float x, float y)
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+	glVertexAttribPointer(0, 3, GL_DOUBLE, GL_FALSE, 3 * sizeof(double), (void*)0);
 	glEnableVertexAttribArray(0);
 
-	// note that this is allowed, the call to glVertexAttribPointer registered VBO as the vertex attribute's bound vertex buffer object so afterwards we can safely unbind
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-	// You can unbind the VAO afterwards so other VAO calls won't accidentally modify this VAO, but this rarely happens. Modifying other
-	// VAOs requires a call to glBindVertexArray anyways so we generally don't unbind VAOs (nor VBOs) when it's not directly necessary.
-	//glBindVertexArray(0);
 
 	return { VAO, VBO, EBO };
 }
