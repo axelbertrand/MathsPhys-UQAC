@@ -44,20 +44,7 @@ void GameEngine::run() {
 		processInput();
 
 		// logic
-		auto particle = std::begin(mParticles);
-		while (particle != std::end(mParticles))
-		{
-			particle->integrate(gravity, frametime);//use last frame time for integration
-			if (!particle->isVisible(WINDOW_WIDTH, WINDOW_HEIGHT))
-			{
-				particle = mParticles.erase(particle);
-			}
-			else
-			{
-				++particle;
-			}
-
-		}
+		update(gravity, frametime);
 
 		// render
 		// ------
@@ -288,8 +275,19 @@ void GameEngine::processInput()
 	}
 }
 
-void GameEngine::update(double t) {
-	for_each(mParticles.begin(), mParticles.end(), [t](Particle& particle) {
-		particle.integrate(Vector3(), t);
-	});
+void GameEngine::update(mathslib::Vector3 newAcceleration, double t) {
+	auto particle = std::begin(mParticles);
+	while (particle != std::end(mParticles))
+	{
+		particle->integrate(newAcceleration, t);
+		if (!particle->isVisible(WINDOW_WIDTH, WINDOW_HEIGHT))
+		{
+			particle = mParticles.erase(particle);
+		}
+		else
+		{
+			++particle;
+		}
+
+	}
 }

@@ -24,7 +24,7 @@ class GameEngine {
 		std::tuple<unsigned int, unsigned int, unsigned int> createVAO(double x, double y);
 
 		void processInput();
-        void update(double t);
+        void update(mathslib::Vector3 newAcceleration, double t);
 
 		std::vector<Particle> mParticles;
 
