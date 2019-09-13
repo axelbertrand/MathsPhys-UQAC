@@ -5,6 +5,7 @@
 #include <GLFW/glfw3.h>
 #include <vector>
 #include <string>
+#include <tuple>
 
 class GameEngine {
     public:
@@ -18,6 +19,9 @@ class GameEngine {
 		void initGlfw();
 		void initWindow(const std::string& title);
 		void initGlad();
+		void initShaders();
+
+		std::tuple<unsigned int, unsigned int, unsigned int> createVAO(double x, double y);
 
 		void processInput();
         void update(double t);
@@ -27,4 +31,6 @@ class GameEngine {
 		GLFWwindow* mWindow;
 		const unsigned int WINDOW_WIDTH;
 		const unsigned int WINDOW_HEIGHT;
+
+		int mShaderProgram;
 };
