@@ -6,9 +6,10 @@
 
 using namespace mathslib;
 
+std::vector<Particle> GameEngine::particles = std::vector<Particle>();
+
 GameEngine::GameEngine(const std::string& title, unsigned int windowWidth, unsigned int windowHeight)
-: mParticles()
-, mWindow(nullptr)
+: mWindow(nullptr)
 , WINDOW_WIDTH(windowWidth)
 , WINDOW_HEIGHT(windowHeight)
 {
@@ -17,7 +18,7 @@ GameEngine::GameEngine(const std::string& title, unsigned int windowWidth, unsig
 	initGlad();
 	initShaders();
 
-	mParticles.push_back(Particle(0.99, 1, Vector3(), Vector3(1, 2, 3), Vector3()));
+	particles.push_back(Particle(0.99, 1, Vector3(), Vector3(1, 2, 3), Vector3()));
 }
 
 GameEngine::~GameEngine() {
@@ -31,6 +32,26 @@ void GameEngine::framebuffer_size_callback(GLFWwindow* window, int width, int he
 	glViewport(0, 0, width, height);
 }
 
+void GameEngine::keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
+{
+	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
+	{
+		glfwSetWindowShouldClose(window, true);
+	}
+	else if (key == GLFW_KEY_Q && action == GLFW_PRESS)
+	{
+		particles.push_back(Particle(0.90, 50, mathslib::Vector3(10, 10, 0), mathslib::Vector3(100, 50, 0), mathslib::Vector3()));
+	}
+	else if (key == GLFW_KEY_W && action == GLFW_PRESS)
+	{
+		particles.push_back(Particle(0.99, 10, mathslib::Vector3(10, 400, 0), mathslib::Vector3(100, 0, 0), mathslib::Vector3()));
+	}
+	else if (key == GLFW_KEY_E && action == GLFW_PRESS)
+	{
+		particles.push_back(Particle(0.95, 1, mathslib::Vector3(10, 10, 0), mathslib::Vector3(100, 100, 0), mathslib::Vector3()));
+	}
+}
+
 void GameEngine::run() {
 	mathslib::Vector3 gravity = mathslib::Vector3(0, -20, 0);
 
@@ -41,7 +62,6 @@ void GameEngine::run() {
 		auto start(std::chrono::system_clock::now());
 		// input
 		// -----
-		processInput();
 
 		// logic
 		update(gravity, frametime);
@@ -55,7 +75,7 @@ void GameEngine::run() {
 
 		// drawing particles
 		glUseProgram(mShaderProgram);
-		for (auto& particle : mParticles) {
+		for (auto& particle : particles) {
 			std::tuple<unsigned int, unsigned int, unsigned int> bufferIDs = createVAO(particle.getPosition().getX(), particle.getPosition().getY());
 			glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 			glDeleteVertexArrays(1, &std::get<0>(bufferIDs));
@@ -103,6 +123,7 @@ void GameEngine::initWindow(const std::string& title)
 
 	glfwMakeContextCurrent(mWindow);
 	glfwSetFramebufferSizeCallback(mWindow, GameEngine::framebuffer_size_callback);
+	glfwSetKeyCallback(mWindow, GameEngine::keyCallback);
 }
 
 void GameEngine::initGlad()
@@ -255,34 +276,14 @@ std::tuple<unsigned int, unsigned int, unsigned int> GameEngine::createVAO(doubl
 	return { VAO, VBO, EBO };
 }
 
-void GameEngine::processInput()
-{
-	if (glfwGetKey(mWindow, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-	{
-		glfwSetWindowShouldClose(mWindow, true);
-	}
-	else if (glfwGetKey(mWindow, GLFW_KEY_Q)  == GLFW_PRESS)
-	{
-		mParticles.push_back(Particle(0.90, 50, mathslib::Vector3(10, 10, 0), mathslib::Vector3(100, 50, 0), mathslib::Vector3()));
-	}
-	else if (glfwGetKey(mWindow, GLFW_KEY_W) == GLFW_PRESS)
-	{
-		mParticles.push_back(Particle(0.99, 10, mathslib::Vector3(10, 400, 0), mathslib::Vector3(100, 0, 0), mathslib::Vector3()));
-	}
-	else if (glfwGetKey(mWindow, GLFW_KEY_E) == GLFW_PRESS)
-	{
-		mParticles.push_back(Particle(0.95, 1, mathslib::Vector3(10, 10, 0), mathslib::Vector3(100, 100, 0), mathslib::Vector3()));
-	}
-}
-
 void GameEngine::update(mathslib::Vector3 newAcceleration, double t) {
-	auto particle = std::begin(mParticles);
-	while (particle != std::end(mParticles))
+	auto particle = std::begin(particles);
+	while (particle != std::end(particles))
 	{
 		particle->integrate(newAcceleration, t);
 		if (!particle->isVisible(WINDOW_WIDTH, WINDOW_HEIGHT))
 		{
-			particle = mParticles.erase(particle);
+			particle = particles.erase(particle);
 		}
 		else
 		{

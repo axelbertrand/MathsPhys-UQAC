@@ -13,8 +13,10 @@ class GameEngine {
         virtual ~GameEngine();
 
 		static void framebuffer_size_callback(GLFWwindow* window, int width, int height);
+		static void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
 
         void run();
+
     private:
 		void initGlfw();
 		void initWindow(const std::string& title);
@@ -23,10 +25,9 @@ class GameEngine {
 
 		std::tuple<unsigned int, unsigned int, unsigned int> createVAO(double x, double y);
 
-		void processInput();
         void update(mathslib::Vector3 newAcceleration, double t);
 
-		std::vector<Particle> mParticles;
+		static std::vector<Particle> particles;
 
 		GLFWwindow* mWindow;
 		const unsigned int WINDOW_WIDTH;
