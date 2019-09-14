@@ -26,6 +26,7 @@ class GameEngine {
 		std::tuple<unsigned int, unsigned int, unsigned int> createVAO(double x, double y);
 
         void update(mathslib::Vector3 newAcceleration, double t);
+		void render();
 
 		static std::vector<Particle> particles;
 

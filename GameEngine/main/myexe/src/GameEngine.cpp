@@ -68,20 +68,7 @@ void GameEngine::run() {
 
 		// render
 		// ------
-
-		// cleaning screen
-		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT);
-
-		// drawing particles
-		glUseProgram(mShaderProgram);
-		for (auto& particle : particles) {
-			std::tuple<unsigned int, unsigned int, unsigned int> bufferIDs = createVAO(particle.getPosition().getX(), particle.getPosition().getY());
-			glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-			glDeleteVertexArrays(1, &std::get<0>(bufferIDs));
-			glDeleteBuffers(1, &std::get<1>(bufferIDs));
-			glDeleteBuffers(1, &std::get<2>(bufferIDs));
-		}
+		render();
 
 		// glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
 		// -------------------------------------------------------------------------------
@@ -122,8 +109,8 @@ void GameEngine::initWindow(const std::string& title)
 	}
 
 	glfwMakeContextCurrent(mWindow);
-	glfwSetFramebufferSizeCallback(mWindow, GameEngine::framebuffer_size_callback);
-	glfwSetKeyCallback(mWindow, GameEngine::keyCallback);
+	glfwSetFramebufferSizeCallback(mWindow, framebuffer_size_callback);
+	glfwSetKeyCallback(mWindow, keyCallback);
 }
 
 void GameEngine::initGlad()
@@ -211,7 +198,7 @@ void GameEngine::initShaders()
 	glDeleteShader(fragmentShader);
 }
 
-std::tuple<unsigned int, unsigned int, unsigned int> GameEngine::createVAO(double x, double y)
+std::tuple<unsigned int, unsigned int, unsigned int> createVAO(double x, double y)
 {
 	double topX = x + 5;
 	if (topX > WINDOW_WIDTH)
@@ -289,6 +276,22 @@ void GameEngine::update(mathslib::Vector3 newAcceleration, double t) {
 		{
 			++particle;
 		}
+	}
+}
 
+void GameEngine::render()
+{
+	// cleaning screen
+	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+	glClear(GL_COLOR_BUFFER_BIT);
+
+	// drawing particles
+	glUseProgram(mShaderProgram);
+	for (auto& particle : particles) {
+		std::tuple<unsigned int, unsigned int, unsigned int> bufferIDs = createVAO(particle.getPosition().getX(), particle.getPosition().getY());
+		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+		glDeleteVertexArrays(1, &std::get<0>(bufferIDs));
+		glDeleteBuffers(1, &std::get<1>(bufferIDs));
+		glDeleteBuffers(1, &std::get<2>(bufferIDs));
 	}
 }
