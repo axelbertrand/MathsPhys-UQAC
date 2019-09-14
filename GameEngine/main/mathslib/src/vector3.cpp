@@ -151,7 +151,7 @@ namespace mathslib
 
 	std::string Vector3::toString() const
 	{
-		return("(x = " + std::to_string(m_x) + " ; y = " + std::to_string(m_y) + " ; z = " + std::to_string(m_z)+")");
+		return("Vector3(x = " + std::to_string(m_x) + " ; y = " + std::to_string(m_y) + " ; z = " + std::to_string(m_z) + ")");
 	}
 
 	
