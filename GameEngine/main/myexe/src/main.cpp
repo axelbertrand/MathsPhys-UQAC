@@ -1,5 +1,3 @@
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
 #include <tuple>
 #include <vector>
 #include <iostream>
@@ -23,75 +21,10 @@ static std::vector<Particle> particles;
 
 int main()
 {
-	// glfw: initialize and configure
-	// ------------------------------
-	glfwInit();
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+	OpenGlWrapper openglWrapper(SCR_WIDTH, SCR_HEIGHT, "Game Engine Demo");
+	opengl_wrapper::ShaderProgram_t shaderProgramm = openglWrapper.createProgram(vertexShaderSource, fragmentShaderSource);
 
-	// glfw window creation
-	// --------------------
-	GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "GameEngine Demo", NULL, NULL);
-	if (window == NULL)
-	{
-		std::cout << "Failed to create GLFW window" << std::endl;
-		glfwTerminate();
-		return EXIT_FAILURE;
-	}
-	glfwMakeContextCurrent(window);
-	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
-	glfwSetKeyCallback(window, keyCallback);
-
-	// glad: load all OpenGL function pointers
-	// ---------------------------------------
-	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
-	{
-		std::cout << "Failed to initialize GLAD" << std::endl;
-		return EXIT_FAILURE;
-	}
-
-	// build and compile our shader program
-	// ------------------------------------
-	// vertex shader
-	int vertexShader = glCreateShader(GL_VERTEX_SHADER);
-	glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
-	glCompileShader(vertexShader);
-	// check for shader compile errors
-	int success;
-	char infoLog[512];
-	glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
-	if (!success)
-	{
-		glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
-		std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
-	}
-	// fragment shader
-	int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-	glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
-	glCompileShader(fragmentShader);
-	// check for shader compile errors
-	glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
-	if (!success)
-	{
-		glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
-		std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << infoLog << std::endl;
-	}
-	// link shaders
-	int shaderProgram = glCreateProgram();
-	glAttachShader(shaderProgram, vertexShader);
-	glAttachShader(shaderProgram, fragmentShader);
-	glLinkProgram(shaderProgram);
-	// check for linking errors
-	glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
-	if (!success) {
-		glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
-		std::cout << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n" << infoLog << std::endl;
-	}
-	glDeleteShader(vertexShader);
-	glDeleteShader(fragmentShader);
-
-	// game loop
+	// game loops
 	// -----------
 	mathslib::Vector3 gravity = mathslib::Vector3(0, -20, 0);
 	double frametime = 0.033333;//first frame considered at 30fps
@@ -144,9 +77,7 @@ int main()
 		frametime = elapsedSeconds.count();//update frametime using last frame
 	}
 
-	// glfw: terminate, clearing all previously allocated GLFW resources.
-	// ------------------------------------------------------------------
-	glfwTerminate();
+
 	return EXIT_SUCCESS;
 }
 
