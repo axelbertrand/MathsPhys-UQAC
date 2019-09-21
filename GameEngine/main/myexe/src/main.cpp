@@ -178,8 +178,3 @@ void generateBuffers(const std::vector<Particle>& particles, std::vector<float>&
 		startIndex += 4;
 	}
 }
-
-
-
-
-
