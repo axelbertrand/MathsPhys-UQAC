@@ -135,10 +135,10 @@ namespace opengl_wrapper
 	}
 
 	// create buffers to contains graphical data
-	std::tuple<unsigned int, unsigned int, unsigned int> OpenGlWrapper::createAndBindDataBuffers(const std::vector<float>& verticesBuffer,
+	std::tuple<unsigned int, unsigned int, unsigned int> OpenGlWrapper::createAndBindDataBuffers(const std::vector<double>& verticesBuffer,
 		const std::vector<unsigned int>& indicesBuffer) const
 	{
-		const float * vertices = verticesBuffer.data();
+		const double * vertices = verticesBuffer.data();
 		const unsigned int* indices = indicesBuffer.data();
 
 		unsigned int VBO, VAO, EBO;
@@ -149,12 +149,12 @@ namespace opengl_wrapper
 		glBindVertexArray(VAO);
 
 		glBindBuffer(GL_ARRAY_BUFFER, VBO);
-		glBufferData(GL_ARRAY_BUFFER, verticesBuffer.size()*sizeof(float), vertices, GL_STREAM_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, verticesBuffer.size()*sizeof(double), vertices, GL_STREAM_DRAW);
 
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, indicesBuffer.size()*sizeof(unsigned int), indices, GL_STATIC_DRAW);
 
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+		glVertexAttribPointer(0, 3, GL_DOUBLE, GL_FALSE, 3 * sizeof(double), (void*)0);
 		glEnableVertexAttribArray(0);
 
 		glBindBuffer(GL_ARRAY_BUFFER, 0);

@@ -29,7 +29,7 @@ namespace opengl_wrapper
 		void swapGraphicalBuffers(GLFWwindow * const window) const;
 		void pollEvent() const;
 		std::tuple<unsigned int, unsigned int> getWindowSize(GLFWwindow* const window) const;
-		std::tuple<unsigned int, unsigned int, unsigned int> createAndBindDataBuffers(const std::vector<float>& verticesBuffer,
+		std::tuple<unsigned int, unsigned int, unsigned int> createAndBindDataBuffers(const std::vector<double>& verticesBuffer,
 			const std::vector<unsigned int>& indicesBuffer) const;
 		void draw(GLenum shape, unsigned int count) const;
 		void cleanAndDeleteDataBuffers(std::tuple<unsigned int, unsigned int, unsigned int> buffers) const;

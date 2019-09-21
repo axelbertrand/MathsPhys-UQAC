@@ -18,7 +18,7 @@ GLFWwindow* initGraphics(const opengl_wrapper::OpenGlWrapper& openglWrapper, con
 	const unsigned int height, const char* vertexShaderSource, const char* fragmentShaderSource);
 void updateGame(std::vector<Particle>& particles, const mathslib::Vector3& gravity, const double frametime);
 void renderGame(const opengl_wrapper::OpenGlWrapper& openglWrapper, GLFWwindow* const mainWindow, const std::vector<Particle>& particles);
-void generateBuffers(const std::vector<Particle>& particles, std::vector<float>& vertices, std::vector<unsigned int>& indices,
+void generateBuffers(const std::vector<Particle>& particles, std::vector<double>& vertices, std::vector<unsigned int>& indices,
 	const double widthMax, const double heightMax);
 
 // settings
@@ -96,7 +96,7 @@ void renderGame(const opengl_wrapper::OpenGlWrapper& openglWrapper, GLFWwindow *
 	openglWrapper.clearCurrentWindow();
 
 	// drawing particles
-	std::vector<float> verticesBuffer;
+	std::vector<double> verticesBuffer;
 	std::vector<unsigned int> indicesBuffer;
 	generateBuffers(particles, verticesBuffer, indicesBuffer, SCR_WIDTH, SCR_HEIGHT);
 	std::tuple<unsigned int, unsigned int, unsigned int> openglBuffers = openglWrapper.createAndBindDataBuffers(verticesBuffer, indicesBuffer);
@@ -131,7 +131,7 @@ void keyCallback(GLFWwindow * window, int key, int scancode, int action, int mod
 
 }
 
-void generateBuffers(const std::vector<Particle>& particles, std::vector<float>& vertices, std::vector<unsigned int> & indices,
+void generateBuffers(const std::vector<Particle>& particles, std::vector<double>& vertices, std::vector<unsigned int> & indices,
 	const double widthMax, const double heightMax)
 {
 	unsigned int startIndex = 0;
