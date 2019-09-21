@@ -16,7 +16,7 @@
 void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
 GLFWwindow* initGraphics(const opengl_wrapper::OpenGlWrapper& openglWrapper, const unsigned int width, 
 	const unsigned int height, const char* vertexShaderSource, const char* fragmentShaderSource);
-void updateGame(std::vector<Particle> particles, const mathslib::Vector3& gravity, const double frametime);
+void updateGame(std::vector<Particle>& particles, const mathslib::Vector3& gravity, const double frametime);
 void renderGame(const opengl_wrapper::OpenGlWrapper& openglWrapper, GLFWwindow* const mainWindow, const std::vector<Particle>& particles);
 void generateBuffers(const std::vector<Particle>& particles, std::vector<float>& vertices, std::vector<unsigned int>& indices,
 	const double widthMax, const double heightMax);
@@ -72,7 +72,7 @@ GLFWwindow* initGraphics(const opengl_wrapper::OpenGlWrapper& openglWrapper, con
 	return mainWindow;
 }
 
-void updateGame(std::vector<Particle> particles, const mathslib::Vector3& gravity, const double frametime)
+void updateGame(std::vector<Particle>& particles, const mathslib::Vector3& gravity, const double frametime)
 {
 	// update the position of the particles
 	auto particle = std::begin(particles);
@@ -100,7 +100,7 @@ void renderGame(const opengl_wrapper::OpenGlWrapper& openglWrapper, GLFWwindow *
 	std::vector<unsigned int> indicesBuffer;
 	generateBuffers(particles, verticesBuffer, indicesBuffer, SCR_WIDTH, SCR_HEIGHT);
 	std::tuple<unsigned int, unsigned int, unsigned int> openglBuffers = openglWrapper.createAndBindDataBuffers(verticesBuffer, indicesBuffer);
-	openglWrapper.draw(GL_TRIANGLES, indicesBuffer.size());
+	openglWrapper.draw(GL_TRIANGLES, static_cast<unsigned int>(indicesBuffer.size()));
 	openglWrapper.cleanAndDeleteDataBuffers(openglBuffers);
 
 	// swapping the double buffers
