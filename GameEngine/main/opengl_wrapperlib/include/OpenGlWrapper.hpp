@@ -21,18 +21,18 @@ namespace opengl_wrapper
 
 		GLFWwindow* getMainWindow() const;
 
-		ShaderProgram_t createProgram(const char* vertexShaderSource, const char* fragmentShaderSource) const;
+		ShaderProgram_t createShadersProgram(const char* vertexShaderSource, const char* fragmentShaderSource) const;
 		bool windowShouldClose(GLFWwindow * const window) const;
 		void clearCurrentWindow(float red = 0.0, float green = 0.0, float blue = 0.0, float opacity = 1.0) const;
 		void useShadersProgram(ShaderProgram_t shadersProgram) const;
 		void setKeyboardCallback(GLFWwindow* window, GLFWkeyfun callbackFunction) const;
-		void swapBuffers(GLFWwindow * const window) const;
+		void swapGraphicalBuffers(GLFWwindow * const window) const;
 		void pollEvent() const;
 		std::tuple<unsigned int, unsigned int> getWindowSize(GLFWwindow* const window) const;
-		std::tuple<unsigned int, unsigned int, unsigned int> createAndBindVAO(const std::vector<float>& verticesBuffer, 
+		std::tuple<unsigned int, unsigned int, unsigned int> createAndBindDataBuffers(const std::vector<float>& verticesBuffer,
 			const std::vector<unsigned int>& indicesBuffer) const;
 		void draw(GLenum shape, unsigned int count) const;
-		void cleanAndDeleteVAO(std::tuple<unsigned int, unsigned int, unsigned int> buffers) const;
+		void cleanAndDeleteDataBuffers(std::tuple<unsigned int, unsigned int, unsigned int> buffers) const;
 	private:
 		GLFWwindow* m_mainWindow;
 	};

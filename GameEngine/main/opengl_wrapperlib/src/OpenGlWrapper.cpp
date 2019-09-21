@@ -49,7 +49,7 @@ namespace opengl_wrapper
 		glfwTerminate();
 	}
 
-	ShaderProgram_t OpenGlWrapper::createProgram(const char* vertexShaderSource, const char* fragmentShaderSource) const
+	ShaderProgram_t OpenGlWrapper::createShadersProgram(const char* vertexShaderSource, const char* fragmentShaderSource) const
 	{
 		// build and compile our shader program
 		// ------------------------------------
@@ -127,7 +127,7 @@ namespace opengl_wrapper
 		glDrawElements(shape, count, GL_UNSIGNED_INT, 0);
 	}
 
-	void OpenGlWrapper::cleanAndDeleteVAO(std::tuple<unsigned int, unsigned int, unsigned int> buffers) const
+	void OpenGlWrapper::cleanAndDeleteDataBuffers(std::tuple<unsigned int, unsigned int, unsigned int> buffers) const
 	{
 		glDeleteVertexArrays(1, &std::get<0>(buffers));
 		glDeleteBuffers(1, &std::get<1>(buffers));
@@ -135,7 +135,7 @@ namespace opengl_wrapper
 	}
 
 	// create buffers to contains graphical data
-	std::tuple<unsigned int, unsigned int, unsigned int> OpenGlWrapper::createAndBindVAO(const std::vector<float>& verticesBuffer,
+	std::tuple<unsigned int, unsigned int, unsigned int> OpenGlWrapper::createAndBindDataBuffers(const std::vector<float>& verticesBuffer,
 		const std::vector<unsigned int>& indicesBuffer) const
 	{
 		const float * vertices = verticesBuffer.data();
@@ -162,18 +162,20 @@ namespace opengl_wrapper
 		return { VAO, VBO, EBO };
 	}
 
-	void OpenGlWrapper::swapBuffers(GLFWwindow* const window) const
+	void OpenGlWrapper::swapGraphicalBuffers(GLFWwindow* const window) const
 	{
 		glfwSwapBuffers(window);
 	}
 
 	void OpenGlWrapper::pollEvent() const
 	{
+		// Processes all pending events.
 		glfwPollEvents();
 	}
 
 	void OpenGlWrapper::setKeyboardCallback(GLFWwindow* window, GLFWkeyfun callbackFunction) const
 	{
+		// Set the callback function to handle keyboard events
 		glfwSetKeyCallback(window, callbackFunction);
 	}
 }
