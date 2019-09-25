@@ -14,8 +14,7 @@
 
 // function definitions
 void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
-GLFWwindow* initGraphics(const opengl_wrapper::OpenGlWrapper& openglWrapper, const unsigned int width, 
-	const unsigned int height, const char* vertexShaderSource, const char* fragmentShaderSource);
+GLFWwindow* initGraphics(const opengl_wrapper::OpenGlWrapper& openglWrapper, const char* vertexShaderSource, const char* fragmentShaderSource);
 void updateGame(std::vector<Particle>& particles, const mathslib::Vector3& gravity, const double frametime);
 void renderGame(const opengl_wrapper::OpenGlWrapper& openglWrapper, GLFWwindow* const mainWindow, const std::vector<Particle>& particles);
 void generateBuffers(const std::vector<Particle>& particles, std::vector<double>& vertices, std::vector<unsigned int>& indices,
@@ -29,7 +28,7 @@ int main()
 {
 	// Initialize graphics
 	opengl_wrapper::OpenGlWrapper openglWrapper(SCR_WIDTH, SCR_HEIGHT, "Game Engine Demo");
-	GLFWwindow* mainWindow = initGraphics(openglWrapper, SCR_WIDTH, SCR_HEIGHT, vertexShaderSource, fragmentShaderSource);
+	GLFWwindow* mainWindow = initGraphics(openglWrapper, vertexShaderSource, fragmentShaderSource);
 
 	// Game variables
 	std::vector<Particle> particles;
@@ -61,8 +60,7 @@ int main()
 	return EXIT_SUCCESS;
 }
 
-GLFWwindow* initGraphics(const opengl_wrapper::OpenGlWrapper& openglWrapper, const unsigned int width, 
-	const unsigned int height, const char * vertexShaderSource, const char * fragmentShaderSource)
+GLFWwindow* initGraphics(const opengl_wrapper::OpenGlWrapper& openglWrapper, const char * vertexShaderSource, const char * fragmentShaderSource)
 {
 	GLFWwindow* mainWindow = openglWrapper.getMainWindow();
 	openglWrapper.setKeyboardCallback(mainWindow, keyCallback);
