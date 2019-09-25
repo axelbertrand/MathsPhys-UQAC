@@ -1,5 +1,5 @@
 #include "vector3.hpp"
-#include "../include/Particle.hpp"
+#include "Particle.hpp"
 #include "ParticleForceGenerator.hpp"
 
 namespace mathslib
