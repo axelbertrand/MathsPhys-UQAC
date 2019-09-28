@@ -2,7 +2,7 @@
 #define NOMINMAX
 #endif
 
-#include "../include/gameEngine.hpp"
+#include "../include/gameWorld.hpp"
 
 int main(int argc, char* argv[])
 {
