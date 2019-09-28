@@ -11,7 +11,7 @@ namespace mathslib
 			DragForceGenerator(double k1, double k2);
 			virtual ~DragForceGenerator();
 
-			void updateForce(Particle* particle, float duration) override;
+			void updateForce(Particle* particle, double duration) override;
 
 		private:
 			double m_k1;

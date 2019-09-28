@@ -20,7 +20,7 @@ namespace mathslib
 
 		void add(ForceRecord& record);
 
-		void updateForces(float duration);
+		void updateForce(Particle* particle, double duration);
 
 	private:
 		std::vector<ForceRecord> m_register;

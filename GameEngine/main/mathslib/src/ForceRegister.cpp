@@ -15,11 +15,13 @@ namespace mathslib
 		m_register.push_back(record);
 	}
 
-	void ForceRegister::updateForces(float duration)
+	void ForceRegister::updateForce(Particle* particle, double duration)
 	{
-		for (ForceRecord& record : m_register)
-		{
-			record.forceGenerator->updateForce(record.particle, duration);
-		}
+		auto found = std::find_if(m_register.begin(), m_register.end(), [&](const ForceRecord& record) {
+			return record.particle == particle;
+		});
+
+		ParticleForceGenerator* forceGenerator = found->forceGenerator;
+		forceGenerator->updateForce(particle, duration);
 	}
 }

@@ -12,7 +12,7 @@ namespace mathslib
 	{
 	}
 
-	void DragForceGenerator::updateForce(Particle* particle, float duration)
+	void DragForceGenerator::updateForce(Particle* particle, double duration)
 	{
 		double speedNorm = particle->getSpeed().getNorm();
 		double squaredSpeedNorm = particle->getSpeed().getSquaredNorm();

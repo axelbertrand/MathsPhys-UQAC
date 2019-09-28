@@ -10,6 +10,6 @@ namespace mathslib
 			ParticleForceGenerator() = default;
 			virtual ~ParticleForceGenerator() = default;
 
-			virtual void updateForce(Particle* particle, float duration) = 0;
+			virtual void updateForce(Particle* particle, double duration) = 0;
 	};
 }

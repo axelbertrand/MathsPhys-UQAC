@@ -82,7 +82,7 @@ void updateGame(std::vector<std::shared_ptr<Particle>>& particles, const double 
 	auto particle = std::begin(particles);
 	while (particle != std::end(particles))
 	{
-		forceRegister.updateForces(frametime);
+		forceRegister.updateForce((*particle).get(), frametime);
 		(*particle)->integrate(frametime); //use last frame time for integration
 		if (!(*particle)->isVisible(SCR_WIDTH, SCR_HEIGHT))
 		{

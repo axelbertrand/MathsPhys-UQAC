@@ -11,7 +11,7 @@ namespace mathslib
 			GravityForceGenerator(Vector3 gravity);
 			virtual ~GravityForceGenerator();
 
-			void updateForce(Particle* particle, float duration) override;
+			void updateForce(Particle* particle, double duration) override;
 
 		private:
 			Vector3 m_gravity;
