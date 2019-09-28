@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.10)
 
-set(GAME_ENGINE_SOURCES src/main.cpp src/inputsManager.cpp)
-set(GAME_ENGINE_HEADERS include/inputsManager.hpp include/shaderSources.hpp)
+set(GAME_ENGINE_SOURCES src/main.cpp src/inputsManager.cpp src/gameEngine.cpp)
+set(GAME_ENGINE_HEADERS include/inputsManager.hpp include/shaderSources.hpp include/gameEngine.hpp)
 
 add_executable(GameEngine ${GAME_ENGINE_SOURCES} ${GAME_ENGINE_HEADERS})
 
