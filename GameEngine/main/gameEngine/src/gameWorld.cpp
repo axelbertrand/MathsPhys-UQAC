@@ -7,7 +7,7 @@
 
 void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
 
-GameEngine::GameEngine(): m_openGlWrapper(SCR_WIDTH, SCR_HEIGHT, WINDOW_TITLE), m_mainWindow(m_openGlWrapper.getMainWindow())
+GameWorld::GameWorld(): m_openGlWrapper(SCR_WIDTH, SCR_HEIGHT, WINDOW_TITLE), m_mainWindow(m_openGlWrapper.getMainWindow())
 {
 	// Initialize graphics
 	m_openGlWrapper.setKeyboardCallback(m_mainWindow, keyCallback);
@@ -18,7 +18,7 @@ GameEngine::GameEngine(): m_openGlWrapper(SCR_WIDTH, SCR_HEIGHT, WINDOW_TITLE), 
 	glfwSetWindowUserPointer(m_mainWindow, &m_inputsManager); //save the manager's pointer to the window to be able to access it in the inputs callback function
 }
 
-void GameEngine::run()
+void GameWorld::run()
 {
 	const mathslib::Vector3 gravity = mathslib::Vector3(0, -20, 0);
 	double frametime = 0.033333;//first frame considered at 30fps
@@ -44,7 +44,7 @@ void GameEngine::run()
 	}
 }
 
-std::vector<InputsManager::Intention> GameEngine::getPendingIntentions()
+std::vector<InputsManager::Intention> GameWorld::getPendingIntentions()
 {
 	m_openGlWrapper.pollEvent(); //triggers the event callbacks
 	std::vector<InputsManager::Intention> pendingIntentions = m_inputsManager.getPendingIntentions();
@@ -52,13 +52,13 @@ std::vector<InputsManager::Intention> GameEngine::getPendingIntentions()
 	return pendingIntentions;
 }
 
-void GameEngine::updateGame(const std::vector<InputsManager::Intention> pendingIntentions, const mathslib::Vector3& gravity, const double frametime)
+void GameWorld::updateGame(const std::vector<InputsManager::Intention> pendingIntentions, const mathslib::Vector3& gravity, const double frametime)
 {
 	processInputs(pendingIntentions);
 	updateParticles(gravity, frametime);
 }
 
-void GameEngine::processInputs(const std::vector<InputsManager::Intention>& pendingIntentions)
+void GameWorld::processInputs(const std::vector<InputsManager::Intention>& pendingIntentions)
 {
 	std::for_each(pendingIntentions.begin(), pendingIntentions.end(),
 		[this](const InputsManager::Intention intention)
@@ -67,7 +67,7 @@ void GameEngine::processInputs(const std::vector<InputsManager::Intention>& pend
 		});
 }
 
-void GameEngine::processIntention(const InputsManager::Intention intention)
+void GameWorld::processIntention(const InputsManager::Intention intention)
 {
 	if (intention == InputsManager::CLOSE_MAIN_WINDOW)
 	{
@@ -87,7 +87,7 @@ void GameEngine::processIntention(const InputsManager::Intention intention)
 	}
 }
 
-void GameEngine::updateParticles(const mathslib::Vector3& gravity, const double frametime)
+void GameWorld::updateParticles(const mathslib::Vector3& gravity, const double frametime)
 {
 	// update the position of the particles
 	auto particle = std::begin(m_particles);
@@ -105,7 +105,7 @@ void GameEngine::updateParticles(const mathslib::Vector3& gravity, const double 
 	}
 }
 
-void GameEngine::renderGame() const
+void GameWorld::renderGame() const
 {
 	// cleaning screen
 	m_openGlWrapper.clearCurrentWindow();
@@ -122,7 +122,7 @@ void GameEngine::renderGame() const
 	m_openGlWrapper.swapGraphicalBuffers(m_mainWindow);
 }
 
-std::tuple<std::vector<double>, std::vector<unsigned int>> GameEngine::generateBuffers() const
+std::tuple<std::vector<double>, std::vector<unsigned int>> GameWorld::generateBuffers() const
 {
 	std::vector<double> vertices;
 	std::vector<unsigned int> indices;

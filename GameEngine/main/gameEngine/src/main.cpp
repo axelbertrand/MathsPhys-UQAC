@@ -6,7 +6,7 @@
 
 int main(int argc, char* argv[])
 {
-	GameEngine gameEngine;
-	gameEngine.run();
+	GameWorld gameWorld;
+	gameWorld.run();
 	return EXIT_SUCCESS;
 }

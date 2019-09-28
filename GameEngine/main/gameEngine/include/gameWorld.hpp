@@ -6,10 +6,10 @@
 #include "particle.hpp"
 #include "../include/inputsManager.hpp"
 
-class GameEngine
+class GameWorld
 {
 public:
-	GameEngine();
+	GameWorld();
 
 	void run();
 private:
@@ -30,5 +30,5 @@ private:
 	void updateParticles(const mathslib::Vector3& gravity, const double frametime);
 
 	void renderGame() const;
-	std::tuple<std::vector<double>, std::vector<unsigned int>> GameEngine::generateBuffers() const;
+	std::tuple<std::vector<double>, std::vector<unsigned int>> generateBuffers() const;
 };
