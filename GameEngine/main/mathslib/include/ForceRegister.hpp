@@ -1,7 +1,9 @@
-#include "Particle.hpp"
+#pragma once
+
 #include "ParticleForceGenerator.hpp"
 
 #include <vector>
+#include <memory>
 
 namespace mathslib
 {
@@ -10,13 +12,15 @@ namespace mathslib
 	public:
 		struct ForceRecord
 		{
+			ForceRecord(Particle& particle, ParticleForceGenerator& forceGenerator);
+
 			Particle* particle;
 			ParticleForceGenerator* forceGenerator;
 		};
 
-		void add(const ForceRecord& record);
-		void remove(const ForceRecord& record);
-		ForceRecord get(unsigned int record) const;
+		void add(ForceRecord& record);
+
+		void updateForces(float duration);
 
 	private:
 		std::vector<ForceRecord> m_register;

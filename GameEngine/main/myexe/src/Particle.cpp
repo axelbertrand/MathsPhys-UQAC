@@ -3,7 +3,7 @@
 
 
 Particle::Particle(double dumping, double inverseMass,  mathslib::Vector3 position, mathslib::Vector3 speed, mathslib::Vector3 acceleration):
-	m_dumping(dumping), m_inverseMass(inverseMass), m_position(position), m_speed(speed), m_acceleration(acceleration)
+	m_dumping(dumping), m_inverseMass(inverseMass), m_position(position), m_speed(speed), m_acceleration(acceleration), m_forceAccumulator()
 {
 }
 
@@ -30,11 +30,22 @@ bool Particle::isVisible(unsigned int xMax, unsigned int yMax) const
 }
 
 // Updates position, speed, acceleration using Newton laws
-void Particle::integrate(const  mathslib::Vector3& newAcceleration, double frameTime)
+void Particle::integrate(double frameTime)
 {
 	m_position += m_speed * frameTime;
 	m_speed = m_speed * pow(m_dumping, frameTime) + m_acceleration * frameTime;
-	m_acceleration = newAcceleration;
+	m_acceleration = m_forceAccumulator;
+	clearAccumulator();
+}
+
+void Particle::addForce(const mathslib::Vector3& force)
+{
+	m_forceAccumulator += force;
+}
+
+void Particle::clearAccumulator()
+{
+	m_forceAccumulator = mathslib::Vector3();
 }
 
 double Particle::getInverseMass() const

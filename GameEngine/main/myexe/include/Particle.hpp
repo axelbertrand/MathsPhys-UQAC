@@ -17,7 +17,9 @@ public:
 	double getDumping() const;
 
 	// Updates position, speed, acceleration using Newton laws
-	void integrate(const mathslib::Vector3& newAcceleration = mathslib::Vector3(), double frameTime = 0.0333333);
+	void integrate(double frameTime = 0.0333333);
+	void addForce(const mathslib::Vector3& force);
+	void clearAccumulator();
 	bool isVisible(unsigned int xMax, unsigned int yMax) const;
 
 	std::string toString() const;
@@ -28,4 +30,5 @@ private:
 	mathslib::Vector3 m_position;
 	mathslib::Vector3 m_speed;
 	mathslib::Vector3 m_acceleration;
+	mathslib::Vector3 m_forceAccumulator;
 };

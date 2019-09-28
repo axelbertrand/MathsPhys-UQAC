@@ -1,4 +1,6 @@
-#include "Particle.hpp"
+#pragma once
+
+#include "../../myexe/include/Particle.hpp"
 
 namespace mathslib
 {
@@ -8,6 +10,6 @@ namespace mathslib
 			ParticleForceGenerator() = default;
 			virtual ~ParticleForceGenerator() = default;
 
-			virtual void updateForce(Particle* particle, float duration) = O;
+			virtual void updateForce(Particle* particle, float duration) = 0;
 	};
 }

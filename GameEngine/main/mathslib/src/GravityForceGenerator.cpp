@@ -11,12 +11,11 @@ namespace mathslib
 	{
 	}
 
-	void GravityForceGenerator::updateForce(Particle& particle, float duration)
+	void GravityForceGenerator::updateForce(Particle* particle, float duration)
 	{
-		double mass = 1. / particle.getInverseMass();
-		if (mass != 0)
+		if (particle->getInverseMass() != 0)
 		{
-			particle.addForce(m_gravity * mass);
+			particle->addForce(m_gravity * particle->getInverseMass());
 		}
 	}
 }

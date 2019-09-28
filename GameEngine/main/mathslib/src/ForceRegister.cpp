@@ -1,23 +1,25 @@
 #include "ForceRegister.hpp"
 
+#include <algorithm>
+
 namespace mathslib
 {
-	void ForceRegister::add(const ForceRecord& record)
+	ForceRegister::ForceRecord::ForceRecord(Particle& particle, ParticleForceGenerator& forceGenerator)
+		: particle(&particle)
+		, forceGenerator(&forceGenerator)
+	{
+	}
+
+	void ForceRegister::add(ForceRecord& record)
 	{
 		m_register.push_back(record);
 	}
 
-	void ForceRegister::remove(const ForceRecord& record)
+	void ForceRegister::updateForces(float duration)
 	{
-		auto found = find(m_register.begin(), m_register.end(), record);
-		if (found != m_register.end())
+		for (ForceRecord& record : m_register)
 		{
-			m_register.erase(found);
+			record.forceGenerator->updateForce(record.particle, duration);
 		}
-	}
-
-	ForceRegister::ForceRecord ForceRegister::get(unsigned int record) const
-	{
-		return m_register.at(record);
 	}
 }

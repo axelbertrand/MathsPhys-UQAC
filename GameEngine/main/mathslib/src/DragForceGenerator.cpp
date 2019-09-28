@@ -1,4 +1,4 @@
-#include "GravityForceGenerator.hpp"
+#include "DragForceGenerator.hpp"
 
 namespace mathslib
 {
@@ -12,14 +12,14 @@ namespace mathslib
 	{
 	}
 
-	void DragForceGenerator::updateForce(Particle& particle, float duration)
+	void DragForceGenerator::updateForce(Particle* particle, float duration)
 	{
-		double speedNorm = particle.getSpeed().getNorm();
-		double squaredSpeedNorm = particle.getSpeed().getSquaredNorm();
-		Vector3 normalizedSpeed = particle.getSpeed().getNormalizedVector();
+		double speedNorm = particle->getSpeed().getNorm();
+		double squaredSpeedNorm = particle->getSpeed().getSquaredNorm();
+		Vector3 normalizedSpeed = particle->getSpeed().getNormalizedVector();
 
-		double dragForce = -normalizedSpeed * (k1 * speedNorm + k2 * squaredSpeedNorm);
+		Vector3 dragForce = -normalizedSpeed * (m_k1 * speedNorm + m_k2 * squaredSpeedNorm);
 
-		particle.addForce(dragForce);
+		particle->addForce(dragForce);
 	}
 }

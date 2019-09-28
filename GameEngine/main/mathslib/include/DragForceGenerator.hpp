@@ -1,6 +1,7 @@
-#include "vector3.hpp"
-#include "Particle.hpp"
+#pragma once
+
 #include "ParticleForceGenerator.hpp"
+#include "vector3.hpp"
 
 namespace mathslib
 {
@@ -10,7 +11,7 @@ namespace mathslib
 			DragForceGenerator(double k1, double k2);
 			virtual ~DragForceGenerator();
 
-			void updateForce(Particle& particle, float duration) override;
+			void updateForce(Particle* particle, float duration) override;
 
 		private:
 			double m_k1;
