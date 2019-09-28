@@ -33,6 +33,7 @@ namespace opengl_wrapper
 			const std::vector<unsigned int>& indicesBuffer) const;
 		void draw(GLenum shape, unsigned int count) const;
 		void cleanAndDeleteDataBuffers(std::tuple<unsigned int, unsigned int, unsigned int> buffers) const;
+		void closeMainWindow() const;
 	private:
 		GLFWwindow* m_mainWindow;
 	};
