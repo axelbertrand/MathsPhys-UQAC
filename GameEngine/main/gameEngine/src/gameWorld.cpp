@@ -2,6 +2,7 @@
 
 #include <chrono>
 #include <algorithm>
+#include <tuple>
 
 #include "../include/shaderSources.hpp"
 
@@ -16,11 +17,12 @@ GameWorld::GameWorld(): m_openGlWrapper(SCR_WIDTH, SCR_HEIGHT, WINDOW_TITLE), m_
 
 	// Game variables
 	glfwSetWindowUserPointer(m_mainWindow, &m_inputsManager); //save the manager's pointer to the window to be able to access it in the inputs callback function
+	gravityGenerator = physicslib::GravityForceGenerator(physicslib::Vector3(0, -20, 0));
 }
 
 void GameWorld::run()
 {
-	const mathslib::Vector3 gravity = mathslib::Vector3(0, -20, 0);
+	
 	double frametime = 0.033333;//first frame considered at 30fps
 	// game loops
 	while (!m_openGlWrapper.windowShouldClose(m_mainWindow))
@@ -32,7 +34,7 @@ void GameWorld::run()
 		auto pendingIntentions = getPendingIntentions();
 
 		// logic
-		updateGame(pendingIntentions, gravity, frametime);
+		updateGame(pendingIntentions, frametime);
 
 		// render
 		renderGame();
@@ -52,10 +54,10 @@ std::vector<InputsManager::Intention> GameWorld::getPendingIntentions()
 	return pendingIntentions;
 }
 
-void GameWorld::updateGame(const std::vector<InputsManager::Intention> pendingIntentions, const mathslib::Vector3& gravity, const double frametime)
+void GameWorld::updateGame(const std::vector<InputsManager::Intention> pendingIntentions, const double frametime)
 {
 	processInputs(pendingIntentions);
-	updateParticles(gravity, frametime);
+	updateParticles(frametime);
 }
 
 void GameWorld::processInputs(const std::vector<InputsManager::Intention>& pendingIntentions)
@@ -75,25 +77,26 @@ void GameWorld::processIntention(const InputsManager::Intention intention)
 	}
 	else if (intention == InputsManager::CREATE_PARTICLE_ONE)
 	{
-		m_particles.push_back(Particle(0.90, 50, mathslib::Vector3(10, 10, 0), mathslib::Vector3(100, 50, 0), mathslib::Vector3()));
+		m_particles.push_back(physicslib::Particle(0.90, 50, physicslib::Vector3(10, 10, 0), physicslib::Vector3(100, 50, 0), physicslib::Vector3()));
 	}
 	else if (intention == InputsManager::CREATE_PARTICLE_TWO)
 	{
-		m_particles.push_back(Particle(0.99, 10, mathslib::Vector3(10, 400, 0), mathslib::Vector3(100, 0, 0), mathslib::Vector3()));
+		m_particles.push_back(physicslib::Particle(0.99, 10, physicslib::Vector3(10, 400, 0), physicslib::Vector3(100, 0, 0), physicslib::Vector3()));
 	}
 	else if (intention == InputsManager::CREATE_PARTICLE_THREE)
 	{
-		m_particles.push_back(Particle(0.95, 1, mathslib::Vector3(10, 10, 0), mathslib::Vector3(100, 100, 0), mathslib::Vector3()));
+		m_particles.push_back(physicslib::Particle(0.95, 1, physicslib::Vector3(10, 10, 0), physicslib::Vector3(100, 100, 0), physicslib::Vector3()));
 	}
 }
 
-void GameWorld::updateParticles(const mathslib::Vector3& gravity, const double frametime)
+void GameWorld::updateParticles(const double frametime)
 {
 	// update the position of the particles
 	auto particle = std::begin(m_particles);
 	while (particle != std::end(m_particles))
 	{
-		particle->integrate(gravity, frametime); //use last frame time for integration
+		//forceRegister.updateForce((*particle).get(), frametime);
+		particle->integrate(frametime); //use last frame time for integration
 		if (!particle->isVisible(SCR_WIDTH, SCR_HEIGHT))
 		{
 			particle = m_particles.erase(particle);
@@ -128,7 +131,7 @@ std::tuple<std::vector<double>, std::vector<unsigned int>> GameWorld::generateBu
 	std::vector<unsigned int> indices;
 
 	unsigned int startIndex = 0;
-	for (const Particle& particle : m_particles)
+	for (const physicslib::Particle& particle : m_particles)
 	{
 		double x = particle.getPosition().getX();
 		double y = particle.getPosition().getY();

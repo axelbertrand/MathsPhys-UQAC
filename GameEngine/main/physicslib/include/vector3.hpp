@@ -1,7 +1,7 @@
 #pragma once
 #include <string>
 
-namespace mathslib
+namespace physicslib
 {
 	class Vector3
 	{
