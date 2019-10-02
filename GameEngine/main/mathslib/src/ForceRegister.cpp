@@ -17,11 +17,12 @@ namespace mathslib
 
 	void ForceRegister::updateForce(Particle* particle, double duration)
 	{
-		auto found = std::find_if(m_register.begin(), m_register.end(), [&](const ForceRecord& record) {
-			return record.particle == particle;
-		});
-
-		ParticleForceGenerator* forceGenerator = found->forceGenerator;
-		forceGenerator->updateForce(particle, duration);
+		for (ForceRecord& record : m_register)
+		{
+			if (record.particle == particle)
+			{
+				record.forceGenerator->updateForce(particle, duration);
+			}
+		}
 	}
 }

@@ -5,7 +5,7 @@
 class Particle
 {
 public:
-	Particle(double dumping = 0, double inverseMass = 0, mathslib::Vector3 position = mathslib::Vector3(), 
+	Particle(double inverseMass = 0, mathslib::Vector3 position = mathslib::Vector3(), 
 		mathslib::Vector3 speed = mathslib::Vector3(), mathslib::Vector3 acceleration = mathslib::Vector3());
 	Particle(Particle const& anotherParticle);
 	virtual ~Particle();
@@ -14,7 +14,6 @@ public:
 	mathslib::Vector3 getSpeed() const;
 	mathslib::Vector3 getAcceleration() const;
 	double getInverseMass() const;
-	double getDumping() const;
 
 	// Updates position, speed, acceleration using Newton laws
 	void integrate(double frameTime = 0.0333333);
@@ -25,7 +24,6 @@ public:
 	std::string toString() const;
 
 private:
-	double m_dumping;
 	double m_inverseMass;
 	mathslib::Vector3 m_position;
 	mathslib::Vector3 m_speed;

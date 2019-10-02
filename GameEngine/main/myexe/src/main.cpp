@@ -13,6 +13,7 @@
 #include "OpenGlWrapper.hpp"
 #include "forceRegister.hpp"
 #include "gravityForceGenerator.hpp"
+#include "dragForceGenerator.hpp"
 
 // function definitions
 void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
@@ -29,6 +30,7 @@ const unsigned int SCR_HEIGHT = 600;
 
 mathslib::ForceRegister forceRegister;
 mathslib::GravityForceGenerator gravityGenerator(mathslib::Vector3(0, -20, 0));
+mathslib::DragForceGenerator dragGenerator(0.2, 0);
 
 int main()
 {
@@ -123,20 +125,23 @@ void keyCallback(GLFWwindow * window, int key, int scancode, int action, int mod
 	}
 	else if (key == GLFW_KEY_Q && action == GLFW_PRESS)
 	{
-		std::shared_ptr<Particle> particle = std::make_shared<Particle>(0.90, 50, mathslib::Vector3(10, 10, 0), mathslib::Vector3(100, 50, 0), mathslib::Vector3());
+		std::shared_ptr<Particle> particle = std::make_shared<Particle>(50, mathslib::Vector3(10, 10, 0), mathslib::Vector3(100, 50, 0), mathslib::Vector3());
 		forceRegister.add(mathslib::ForceRegister::ForceRecord(*particle, gravityGenerator));
+		forceRegister.add(mathslib::ForceRegister::ForceRecord(*particle, dragGenerator));
 		particles->push_back(particle);
 	}
 	else if (key == GLFW_KEY_W && action == GLFW_PRESS)
 	{
-		std::shared_ptr<Particle> particle = std::make_shared<Particle>(0.99, 10, mathslib::Vector3(10, 400, 0), mathslib::Vector3(100, 0, 0), mathslib::Vector3());
+		std::shared_ptr<Particle> particle = std::make_shared<Particle>(10, mathslib::Vector3(10, 400, 0), mathslib::Vector3(100, 0, 0), mathslib::Vector3());
 		forceRegister.add(mathslib::ForceRegister::ForceRecord(*particle, gravityGenerator));
+		forceRegister.add(mathslib::ForceRegister::ForceRecord(*particle, dragGenerator));
 		particles->push_back(particle);
 	}
 	else if (key == GLFW_KEY_E && action == GLFW_PRESS)
 	{
-		std::shared_ptr<Particle> particle = std::make_shared<Particle>(0.95, 1, mathslib::Vector3(10, 10, 0), mathslib::Vector3(100, 100, 0), mathslib::Vector3());
+		std::shared_ptr<Particle> particle = std::make_shared<Particle>(1, mathslib::Vector3(10, 10, 0), mathslib::Vector3(100, 100, 0), mathslib::Vector3());
 		forceRegister.add(mathslib::ForceRegister::ForceRecord(*particle, gravityGenerator));
+		forceRegister.add(mathslib::ForceRegister::ForceRecord(*particle, dragGenerator));
 		particles->push_back(particle);
 	}
 }
