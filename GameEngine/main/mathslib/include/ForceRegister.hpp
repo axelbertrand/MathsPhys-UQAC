@@ -19,6 +19,7 @@ namespace mathslib
 		};
 
 		void add(ForceRecord& record);
+		void remove(Particle* particle);
 
 		void updateForce(Particle* particle, double duration);
 

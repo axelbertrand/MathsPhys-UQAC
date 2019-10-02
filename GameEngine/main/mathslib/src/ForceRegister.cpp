@@ -15,6 +15,15 @@ namespace mathslib
 		m_register.push_back(record);
 	}
 
+	void ForceRegister::remove(Particle* particle)
+	{
+		std::remove_if(m_register.begin(), m_register.end(),
+			[particle](ForceRecord& record)
+			{
+				return record.particle == particle;
+			});
+	}
+
 	void ForceRegister::updateForce(Particle* particle, double duration)
 	{
 		for (ForceRecord& record : m_register)
