@@ -17,11 +17,13 @@ namespace mathslib
 
 	void ForceRegister::remove(Particle* particle)
 	{
-		std::remove_if(m_register.begin(), m_register.end(),
+		auto last = std::remove_if(m_register.begin(), m_register.end(),
 			[particle](ForceRecord& record)
 			{
 				return record.particle == particle;
 			});
+
+		m_register.erase(last, m_register.end());
 	}
 
 	void ForceRegister::updateForce(Particle* particle, double duration)

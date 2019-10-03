@@ -88,8 +88,8 @@ void updateGame(std::vector<std::shared_ptr<Particle>>& particles, const double 
 		(*particle)->integrate(frametime); //use last frame time for integration
 		if (!(*particle)->isVisible(SCR_WIDTH, SCR_HEIGHT))
 		{
-			particle = particles.erase(particle);
 			forceRegister.remove(particle->get());
+			particle = particles.erase(particle);
 		}
 		else
 		{
