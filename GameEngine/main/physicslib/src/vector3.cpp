@@ -1,7 +1,7 @@
 #include <iostream>
 #include <math.h>
 #include "..\include\vector3.hpp"
-namespace mathslib
+namespace physicslib
 {
 	Vector3::Vector3() {};
 
@@ -34,7 +34,7 @@ namespace mathslib
 		return *this;
 	}
 
-	/*static mathslib::Vector3 operator* (double d, mathslib::Vector3 v)
+	/*static physicslib::Vector3 operator* (double d, physicslib::Vector3 v)
 	{
 		return v * d;
 	}*/

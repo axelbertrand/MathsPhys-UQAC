@@ -1,4 +1,4 @@
-#include "..\include\OpenGlWrapper.hpp"
+#include "..\include\openGlWrapper.hpp"
 
 #include <cassert>
 #include <iostream>
@@ -177,5 +177,10 @@ namespace opengl_wrapper
 	{
 		// Set the callback function to handle keyboard events
 		glfwSetKeyCallback(window, callbackFunction);
+	}
+
+	void OpenGlWrapper::closeMainWindow() const
+	{
+		glfwSetWindowShouldClose(m_mainWindow, true);
 	}
 }
