@@ -90,6 +90,7 @@ namespace physicslib
 		return this->ScalarMultiplication(scalar);
 	}
 
+
 	Vector3 Vector3::ScalarDivision(double scalar) const
 	{
 		if (scalar != 0)
