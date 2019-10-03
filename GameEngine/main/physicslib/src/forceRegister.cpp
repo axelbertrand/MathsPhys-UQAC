@@ -15,13 +15,25 @@ namespace physicslib
 		m_register.push_back(record);
 	}
 
+	void ForceRegister::remove(Particle* particle)
+	{
+		auto last = std::remove_if(m_register.begin(), m_register.end(),
+			[particle](ForceRecord& record)
+			{
+				return record.particle == particle;
+			});
+
+		m_register.erase(last, m_register.end());
+	}
+
 	void ForceRegister::updateForce(Particle* particle, double duration)
 	{
-		auto found = std::find_if(m_register.begin(), m_register.end(), [&](const ForceRecord& record) {
-			return record.particle == particle;
-		});
-
-		ParticleForceGenerator* forceGenerator = found->forceGenerator;
-		forceGenerator->updateForce(particle, duration);
+		for (ForceRecord& record : m_register)
+		{
+			if (record.particle == particle)
+			{
+				record.forceGenerator->updateForce(particle, duration);
+			}
+		}
 	}
 }

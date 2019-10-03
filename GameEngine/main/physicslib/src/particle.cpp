@@ -3,13 +3,13 @@
 
 namespace physicslib
 {
-	Particle::Particle(double dumping, double inverseMass, physicslib::Vector3 position, physicslib::Vector3 speed, physicslib::Vector3 acceleration) :
-		m_dumping(dumping), m_inverseMass(inverseMass), m_position(position), m_speed(speed), m_acceleration(acceleration), m_forceAccumulator()
+	Particle::Particle(double inverseMass, physicslib::Vector3 position, physicslib::Vector3 speed, physicslib::Vector3 acceleration) :
+		m_inverseMass(inverseMass), m_position(position), m_speed(speed), m_acceleration(acceleration), m_forceAccumulator()
 	{
 	}
 
 	Particle::Particle(Particle const& anotherParticle) :
-		m_dumping(anotherParticle.getDumping()), m_inverseMass(anotherParticle.getInverseMass()), m_position(physicslib::Vector3(anotherParticle.getPosition())),
+		m_inverseMass(anotherParticle.getInverseMass()), m_position(physicslib::Vector3(anotherParticle.getPosition())),
 		m_speed(physicslib::Vector3(anotherParticle.getSpeed())), m_acceleration(physicslib::Vector3(anotherParticle.getAcceleration()))
 	{
 	}
@@ -34,7 +34,7 @@ namespace physicslib
 	void Particle::integrate(double frameTime)
 	{
 		m_position += m_speed * frameTime;
-		m_speed = m_speed * pow(m_dumping, frameTime) + m_acceleration * frameTime;
+		m_speed = m_speed + m_acceleration * frameTime;
 		m_acceleration = m_forceAccumulator;
 		clearAccumulator();
 	}
@@ -64,11 +64,6 @@ namespace physicslib
 		return m_speed;
 	}
 
-	double Particle::getDumping() const
-	{
-		return m_dumping;
-	}
-
 	physicslib::Vector3 Particle::getAcceleration() const
 	{
 		return m_acceleration;
@@ -76,8 +71,7 @@ namespace physicslib
 
 	std::string Particle::toString() const
 	{
-		std::string result = "dumping = " + std::to_string(m_dumping) + "\n";
-		result += "inverseMass = " + std::to_string(m_inverseMass) + "\n";
+		std::string result = "inverseMass = " + std::to_string(m_inverseMass) + "\n";
 		result += "position = (" + m_position.toString() + ")\n";
 		result += "speed = (" + m_speed.toString() + ")\n";
 		result += "acceleration = (" + m_acceleration.toString() + ")\n";

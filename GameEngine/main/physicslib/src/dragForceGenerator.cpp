@@ -18,7 +18,7 @@ namespace physicslib
 		double squaredSpeedNorm = particle->getSpeed().getSquaredNorm();
 		Vector3 normalizedSpeed = particle->getSpeed().getNormalizedVector();
 
-		Vector3 dragForce = normalizedSpeed * (m_k1 * speedNorm + m_k2 * squaredSpeedNorm) * -1;
+		Vector3 dragForce = -normalizedSpeed * (m_k1 * speedNorm + m_k2 * squaredSpeedNorm);
 
 		particle->addForce(dragForce);
 	}

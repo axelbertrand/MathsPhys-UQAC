@@ -22,6 +22,7 @@ namespace physicslib
 		double operator*(const Vector3& anotherVector) const;
 		Vector3 operator/(double scalar) const;
 		Vector3 operator^(const Vector3& anotherVector) const;
+		Vector3 operator-() const;
 
 		Vector3 VectorAddition(Vector3 const& anotherVectorv) const;
 		Vector3 VectorSubtraction(Vector3 const& anotherVector) const;

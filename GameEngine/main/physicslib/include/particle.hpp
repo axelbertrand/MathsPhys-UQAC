@@ -6,7 +6,7 @@ namespace physicslib
 	class Particle
 	{
 	public:
-		Particle(double dumping = 0, double inverseMass = 0, physicslib::Vector3 position = physicslib::Vector3(),
+		Particle(double inverseMass = 0, physicslib::Vector3 position = physicslib::Vector3(),
 			physicslib::Vector3 speed = physicslib::Vector3(), physicslib::Vector3 acceleration = physicslib::Vector3());
 		Particle(Particle const& anotherParticle);
 		virtual ~Particle();
@@ -15,7 +15,6 @@ namespace physicslib
 		physicslib::Vector3 getSpeed() const;
 		physicslib::Vector3 getAcceleration() const;
 		double getInverseMass() const;
-		double getDumping() const;
 
 		// Updates position, speed, acceleration using Newton laws
 		void integrate(double frameTime = 0.0333333);
@@ -26,7 +25,6 @@ namespace physicslib
 		std::string toString() const;
 
 	private:
-		double m_dumping;
 		double m_inverseMass;
 		physicslib::Vector3 m_position;
 		physicslib::Vector3 m_speed;

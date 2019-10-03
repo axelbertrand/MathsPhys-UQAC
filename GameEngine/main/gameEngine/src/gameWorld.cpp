@@ -17,7 +17,6 @@ GameWorld::GameWorld(): m_openGlWrapper(SCR_WIDTH, SCR_HEIGHT, WINDOW_TITLE), m_
 
 	// Game variables
 	glfwSetWindowUserPointer(m_mainWindow, &m_inputsManager); //save the manager's pointer to the window to be able to access it in the inputs callback function
-	gravityGenerator = physicslib::GravityForceGenerator(physicslib::Vector3(0, -20, 0));
 }
 
 void GameWorld::run()
@@ -77,15 +76,24 @@ void GameWorld::processIntention(const InputsManager::Intention intention)
 	}
 	else if (intention == InputsManager::CREATE_PARTICLE_ONE)
 	{
-		m_particles.push_back(physicslib::Particle(0.90, 50, physicslib::Vector3(10, 10, 0), physicslib::Vector3(100, 50, 0), physicslib::Vector3()));
+		std::shared_ptr<physicslib::Particle> particle = std::make_shared<physicslib::Particle>(50, physicslib::Vector3(10, 10, 0), physicslib::Vector3(100, 50, 0), physicslib::Vector3());
+		forceRegister.add(physicslib::ForceRegister::ForceRecord(*particle, gravityGenerator));
+		forceRegister.add(physicslib::ForceRegister::ForceRecord(*particle, dragGenerator));
+		m_particles.push_back(particle);
 	}
 	else if (intention == InputsManager::CREATE_PARTICLE_TWO)
 	{
-		m_particles.push_back(physicslib::Particle(0.99, 10, physicslib::Vector3(10, 400, 0), physicslib::Vector3(100, 0, 0), physicslib::Vector3()));
+		std::shared_ptr<physicslib::Particle> particle = std::make_shared<physicslib::Particle>(10, physicslib::Vector3(10, 400, 0), physicslib::Vector3(100, 0, 0), physicslib::Vector3());
+		forceRegister.add(physicslib::ForceRegister::ForceRecord(*particle, gravityGenerator));
+		forceRegister.add(physicslib::ForceRegister::ForceRecord(*particle, dragGenerator));
+		m_particles.push_back(particle);
 	}
 	else if (intention == InputsManager::CREATE_PARTICLE_THREE)
 	{
-		m_particles.push_back(physicslib::Particle(0.95, 1, physicslib::Vector3(10, 10, 0), physicslib::Vector3(100, 100, 0), physicslib::Vector3()));
+		std::shared_ptr<physicslib::Particle> particle = std::make_shared<physicslib::Particle>(1, physicslib::Vector3(10, 10, 0), physicslib::Vector3(100, 100, 0), physicslib::Vector3());
+		forceRegister.add(physicslib::ForceRegister::ForceRecord(*particle, gravityGenerator));
+		forceRegister.add(physicslib::ForceRegister::ForceRecord(*particle, dragGenerator));
+		m_particles.push_back(particle);
 	}
 }
 
@@ -95,10 +103,11 @@ void GameWorld::updateParticles(const double frametime)
 	auto particle = std::begin(m_particles);
 	while (particle != std::end(m_particles))
 	{
-		//forceRegister.updateForce((*particle).get(), frametime);
-		particle->integrate(frametime); //use last frame time for integration
-		if (!particle->isVisible(SCR_WIDTH, SCR_HEIGHT))
+		forceRegister.updateForce(particle->get(), frametime);
+		(*particle)->integrate(frametime); //use last frame time for integration
+		if (!(*particle)->isVisible(SCR_WIDTH, SCR_HEIGHT))
 		{
+			forceRegister.remove(particle->get());
 			particle = m_particles.erase(particle);
 		}
 		else
@@ -131,10 +140,10 @@ std::tuple<std::vector<double>, std::vector<unsigned int>> GameWorld::generateBu
 	std::vector<unsigned int> indices;
 
 	unsigned int startIndex = 0;
-	for (const physicslib::Particle& particle : m_particles)
+	for (auto particle : m_particles)
 	{
-		double x = particle.getPosition().getX();
-		double y = particle.getPosition().getY();
+		double x = particle->getPosition().getX();
+		double y = particle->getPosition().getY();
 
 		double topX = std::min(x + 5, static_cast<double>(SCR_WIDTH));
 		double bottomX = std::max(x - 5, 0.0);
