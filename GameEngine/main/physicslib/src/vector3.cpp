@@ -129,6 +129,11 @@ namespace physicslib
 		res.setZ(m_z * anotherVector.getZ());
 		return res;
 	}
+
+	Vector3 Vector3::operator-() const
+	{
+		return Vector3(-m_x, -m_y, -m_z);
+	}
 	
 
 	double Vector3::getNorm() const

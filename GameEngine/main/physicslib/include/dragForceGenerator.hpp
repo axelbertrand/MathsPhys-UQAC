@@ -14,7 +14,7 @@ namespace physicslib
 		void updateForce(Particle* particle, double duration) override;
 
 	private:
-		double m_k1;
-		double m_k2;
+		const double m_k1;
+		const double m_k2;
 	};
 }

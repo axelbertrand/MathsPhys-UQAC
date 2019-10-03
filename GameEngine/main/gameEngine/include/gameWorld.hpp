@@ -7,6 +7,7 @@
 #include "particle.hpp"
 #include "particleForceGenerator.hpp"
 #include "gravityForceGenerator.hpp"
+#include "dragForceGenerator.hpp"
 #include "forceRegister.hpp"
 #include "../include/inputsManager.hpp"
 
@@ -22,11 +23,12 @@ private:
 	const std::string WINDOW_TITLE = "Game Engine Demo";
 	physicslib::ForceRegister forceRegister;
 	physicslib::GravityForceGenerator gravityGenerator = physicslib::GravityForceGenerator(physicslib::Vector3(0, -20, 0));
+	physicslib::DragForceGenerator dragGenerator = physicslib::DragForceGenerator(0.2, 0);
 
 	const opengl_wrapper::OpenGlWrapper m_openGlWrapper;
 	GLFWwindow * const m_mainWindow;
 	InputsManager m_inputsManager;
-	std::vector<physicslib::Particle> m_particles;
+	std::vector<std::shared_ptr<physicslib::Particle>> m_particles;
 
 	std::vector<InputsManager::Intention> getPendingIntentions();
 
