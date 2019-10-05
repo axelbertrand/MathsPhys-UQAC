@@ -34,3 +34,4 @@
 # Visual Studio files
 GameEngine/.vs/*
 GameEngine/out/*
+.vs/*
