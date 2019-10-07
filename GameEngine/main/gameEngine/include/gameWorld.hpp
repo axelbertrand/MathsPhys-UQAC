@@ -35,7 +35,7 @@ private:
 	void updateGame(const std::vector<InputsManager::Intention> pendingIntentions, const double frametime);
 	void processInputs(const std::vector<InputsManager::Intention>& pendingIntentions);
 	void processIntention(InputsManager::Intention intention);
-	void updateParticles(const double frametime);
+	void updatePhysics(const double frametime);
 
 	void renderGame() const;
 	std::tuple<std::vector<double>, std::vector<unsigned int>> generateBuffers() const;

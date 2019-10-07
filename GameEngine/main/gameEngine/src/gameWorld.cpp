@@ -56,7 +56,7 @@ std::vector<InputsManager::Intention> GameWorld::getPendingIntentions()
 void GameWorld::updateGame(const std::vector<InputsManager::Intention> pendingIntentions, const double frametime)
 {
 	processInputs(pendingIntentions);
-	updateParticles(frametime);
+	updatePhysics(frametime);
 }
 
 void GameWorld::processInputs(const std::vector<InputsManager::Intention>& pendingIntentions)
@@ -97,13 +97,14 @@ void GameWorld::processIntention(const InputsManager::Intention intention)
 	}
 }
 
-void GameWorld::updateParticles(const double frametime)
+void GameWorld::updatePhysics(const double frametime)
 {
+	forceRegister.updateAllForces(frametime);
+
 	// update the position of the particles
 	auto particle = std::begin(m_particles);
 	while (particle != std::end(m_particles))
 	{
-		forceRegister.updateForce(particle->get(), frametime);
 		(*particle)->integrate(frametime); //use last frame time for integration
 		if (!(*particle)->isVisible(SCR_WIDTH, SCR_HEIGHT))
 		{

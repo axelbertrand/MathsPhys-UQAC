@@ -26,14 +26,12 @@ namespace physicslib
 		m_register.erase(last, m_register.end());
 	}
 
-	void ForceRegister::updateForce(Particle* particle, double duration)
+	void ForceRegister::updateAllForces(double duration)
 	{
-		for (ForceRecord& record : m_register)
-		{
-			if (record.particle == particle)
+		std::for_each(m_register.begin(), m_register.end(), 
+			[duration](ForceRecord& record)
 			{
-				record.forceGenerator->updateForce(particle, duration);
-			}
-		}
+				record.forceGenerator->updateForce(record.particle, duration);
+			});
 	}
 }

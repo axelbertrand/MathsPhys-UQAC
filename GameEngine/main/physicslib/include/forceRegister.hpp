@@ -17,12 +17,10 @@ namespace physicslib
 			Particle* particle;
 			ParticleForceGenerator* forceGenerator;
 		};
-
 		void add(ForceRecord& record);
 		void remove(Particle* particle);
 
-		void updateForce(Particle* particle, double duration);
-
+		void updateAllForces(double duration);
 	private:
 		std::vector<ForceRecord> m_register;
 	};
