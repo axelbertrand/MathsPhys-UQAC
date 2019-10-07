@@ -18,9 +18,11 @@ public:
 
 	void run();
 private:
+	const unsigned int PARTICLE_RADIUS = 100;
 	const unsigned int SCR_WIDTH = 800;
 	const unsigned int SCR_HEIGHT = 600;
 	const std::string WINDOW_TITLE = "Game Engine Demo";
+	opengl_wrapper::ShaderProgram_t m_shadersProgramm;
 	physicslib::ForceRegister forceRegister;
 	physicslib::GravityForceGenerator gravityGenerator = physicslib::GravityForceGenerator(physicslib::Vector3(0, -20, 0));
 	physicslib::DragForceGenerator dragGenerator = physicslib::DragForceGenerator(0.2, 0);

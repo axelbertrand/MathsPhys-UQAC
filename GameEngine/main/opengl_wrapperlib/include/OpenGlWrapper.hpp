@@ -9,7 +9,7 @@
 
 namespace opengl_wrapper
 {
-	using ShaderProgram_t = int;
+	using ShaderProgram_t = unsigned int;
 
 	void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 
@@ -34,6 +34,13 @@ namespace opengl_wrapper
 		void draw(GLenum shape, unsigned int count) const;
 		void cleanAndDeleteDataBuffers(std::tuple<unsigned int, unsigned int, unsigned int> buffers) const;
 		void closeMainWindow() const;
+
+		template<typename T>
+		void setUniformShaderVariable(ShaderProgram_t shadersProgramm, const std::string_view varName, T value) const
+		{
+			int circleRadiusLocation = glGetUniformLocation(shadersProgramm, varName.data());
+			glUniform1f(circleRadiusLocation, value);
+		}
 	private:
 		GLFWwindow* m_mainWindow;
 	};

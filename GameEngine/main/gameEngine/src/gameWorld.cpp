@@ -3,6 +3,7 @@
 #include <chrono>
 #include <algorithm>
 #include <tuple>
+#include <cmath>
 
 #include "../include/shaderSources.hpp"
 
@@ -12,8 +13,8 @@ GameWorld::GameWorld(): m_openGlWrapper(SCR_WIDTH, SCR_HEIGHT, WINDOW_TITLE), m_
 {
 	// Initialize graphics
 	m_openGlWrapper.setKeyboardCallback(m_mainWindow, keyCallback);
-	opengl_wrapper::ShaderProgram_t shadersProgramm = m_openGlWrapper.createShadersProgram(vertexShaderSource, fragmentShaderSource);
-	m_openGlWrapper.useShadersProgram(shadersProgramm);
+	m_shadersProgramm = m_openGlWrapper.createShadersProgram(vertexShaderSource, fragmentShaderSource);
+	m_openGlWrapper.useShadersProgram(m_shadersProgramm);
 
 	// Game variables
 	glfwSetWindowUserPointer(m_mainWindow, &m_inputsManager); //save the manager's pointer to the window to be able to access it in the inputs callback function
@@ -128,6 +129,7 @@ void GameWorld::renderGame() const
 	std::vector<double> verticesBuffer = std::get<0>(buffers);
 	std::vector<unsigned int> indicesBuffer = std::get<1>(buffers);
 	auto openglBuffers = m_openGlWrapper.createAndBindDataBuffers(verticesBuffer, indicesBuffer);
+	m_openGlWrapper.setUniformShaderVariable(m_shadersProgramm, "circleRadius", PARTICLE_RADIUS);
 	m_openGlWrapper.draw(GL_TRIANGLES, static_cast<unsigned int>(indicesBuffer.size()));
 	m_openGlWrapper.cleanAndDeleteDataBuffers(openglBuffers);
 
@@ -146,29 +148,42 @@ std::tuple<std::vector<double>, std::vector<unsigned int>> GameWorld::generateBu
 		double x = particle->getPosition().getX();
 		double y = particle->getPosition().getY();
 
-		double topX = std::min(x + 5, static_cast<double>(SCR_WIDTH));
-		double bottomX = std::max(x - 5, 0.0);
-		double topY = std::min(y + 5, static_cast<double>(SCR_HEIGHT));
-		double bottomY = std::max(y - 5, 0.0);
+		double squareStep = std::floor((PARTICLE_RADIUS / 2));
+		double topX = std::min(x + squareStep, static_cast<double>(SCR_WIDTH));
+		double bottomX = std::max(x - squareStep, 0.0);
+		double topY = std::min(y + squareStep, static_cast<double>(SCR_HEIGHT));
+		double bottomY = std::max(y - squareStep, 0.0);
 
 		// top right
 		vertices.push_back(topX);
 		vertices.push_back(topY);
+		vertices.push_back(0);
+		vertices.push_back(x);
+		vertices.push_back(y);
 		vertices.push_back(0);
 
 		// bottom right
 		vertices.push_back(topX);
 		vertices.push_back(bottomY);
 		vertices.push_back(0);
+		vertices.push_back(x);
+		vertices.push_back(y);
+		vertices.push_back(0);
 
 		// bottom left
 		vertices.push_back(bottomX);
 		vertices.push_back(bottomY);
 		vertices.push_back(0);
+		vertices.push_back(x);
+		vertices.push_back(y);
+		vertices.push_back(0);
 
 		// top left
 		vertices.push_back(bottomX);
 		vertices.push_back(topY);
+		vertices.push_back(0);
+		vertices.push_back(x);
+		vertices.push_back(y);
 		vertices.push_back(0);
 
 		// first triangle
