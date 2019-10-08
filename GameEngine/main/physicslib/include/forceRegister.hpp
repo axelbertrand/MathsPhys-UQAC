@@ -12,13 +12,13 @@ namespace physicslib
 	public:
 		struct ForceRecord
 		{
-			ForceRecord(Particle& particle, ParticleForceGenerator& forceGenerator);
+			ForceRecord(std::shared_ptr<Particle> particle, std::shared_ptr<ParticleForceGenerator> forceGenerator);
 
-			Particle* particle;
-			ParticleForceGenerator* forceGenerator;
+			std::shared_ptr<Particle> particle;
+			std::shared_ptr<ParticleForceGenerator> forceGenerator;
 		};
-		void add(ForceRecord& record);
-		void remove(Particle* particle);
+		void add(const ForceRecord& record);
+		void remove(std::shared_ptr<Particle> particle);
 
 		void updateAllForces(double duration);
 	private:

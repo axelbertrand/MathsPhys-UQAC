@@ -9,9 +9,8 @@ namespace physicslib
 	{
 	public:
 		DragForceGenerator(double k1, double k2);
-		virtual ~DragForceGenerator();
 
-		void updateForce(Particle* particle, double duration) override;
+		void updateForce(std::shared_ptr<Particle> particle, const double duration) const override;
 
 	private:
 		const double m_k1;

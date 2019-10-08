@@ -8,15 +8,14 @@ namespace physicslib
 	class ParticleSpringForceGenerator : public ParticleForceGenerator
 	{
 	public:
-		ParticleSpringForceGenerator(Particle otherParticle, double elasticity, double restingLength);
-		virtual ~ParticleSpringForceGenerator();
+		ParticleSpringForceGenerator(const std::shared_ptr<const Particle> otherParticle, double elasticity, double restingLength);
 
-		void updateForce(Particle* particle, double duration) override;
+		void updateForce(std::shared_ptr<Particle> particle, const double duration) const override;
 
 	private:
-		Particle m_otherParticle;
-		double m_elasticity;
-		double m_restingLength;
+		const std::shared_ptr<const Particle> m_otherParticle;
+		const double m_elasticity;
+		const double m_restingLength;
 	};
 }
 

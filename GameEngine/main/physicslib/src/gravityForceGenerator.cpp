@@ -7,11 +7,7 @@ namespace physicslib
 	{
 	}
 
-	GravityForceGenerator::~GravityForceGenerator()
-	{
-	}
-
-	void GravityForceGenerator::updateForce(Particle* particle, double duration)
+	void GravityForceGenerator::updateForce(std::shared_ptr<Particle> particle, const double duration) const
 	{
 		if (particle->getInverseMass() != 0)
 		{

@@ -9,11 +9,10 @@ namespace physicslib
 	{
 		public:
 			GravityForceGenerator(Vector3 gravity);
-			virtual ~GravityForceGenerator();
 
-			void updateForce(Particle* particle, double duration) override;
+			void updateForce(std::shared_ptr<Particle> particle, const double duration) const override;
 
 		private:
-			Vector3 m_gravity;
+			const Vector3 m_gravity;
 	};
 }

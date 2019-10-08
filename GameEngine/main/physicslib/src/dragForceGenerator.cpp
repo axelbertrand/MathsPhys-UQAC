@@ -8,11 +8,7 @@ namespace physicslib
 	{
 	}
 
-	DragForceGenerator::~DragForceGenerator()
-	{
-	}
-
-	void DragForceGenerator::updateForce(Particle* particle, double duration)
+	void DragForceGenerator::updateForce(std::shared_ptr<Particle> particle, const double duration) const
 	{
 		double speedNorm = particle->getSpeed().getNorm();
 		double squaredSpeedNorm = particle->getSpeed().getSquaredNorm();

@@ -11,7 +11,7 @@ namespace physicslib
 	ParticleStiffSpringForceGenerator::~ParticleStiffSpringForceGenerator()
 	{}
 
-	void ParticleStiffSpringForceGenerator::updateForce(Particle* particle, double duration)
+	void ParticleStiffSpringForceGenerator::updateForce(std::shared_ptr<Particle> particle, const double duration) const
 	{
 		Vector3 positionFromRest = particle->getPosition() - m_anchorPosition;
 		particle->addForce(positionFromRest * (-m_elasticity) - particle->getSpeed() * m_damping); // TODO à revoir

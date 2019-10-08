@@ -9,14 +9,13 @@ namespace physicslib
 	{
 	public :
 		ParticleBuoyancyForceGenerator(double maxDepth, double objectVolume, double liquidHeight, double liquidDensity);
-		virtual ~ParticleBuoyancyForceGenerator();
 
-		void updateForce(Particle* particle, double duration) override;
+		void updateForce(std::shared_ptr<Particle> particle, const double duration) const override;
 
 	private:
-		double m_maxDepth;
-		double m_objectVolume;
-		double m_liquidHeight;
-		double m_liquidDensity;
+		const double m_maxDepth;
+		const double m_objectVolume;
+		const double m_liquidHeight;
+		const double m_liquidDensity;
 	};
 }

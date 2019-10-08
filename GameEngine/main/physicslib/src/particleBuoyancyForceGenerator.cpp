@@ -8,10 +8,7 @@ namespace physicslib
 		m_maxDepth(maxDepth), m_objectVolume(objectVolume), m_liquidHeight(liquidHeight), m_liquidDensity(liquidDensity)
 	{}
 
-	ParticleBuoyancyForceGenerator::~ParticleBuoyancyForceGenerator()
-	{}
-
-	void ParticleBuoyancyForceGenerator::updateForce(Particle* particle, double duration)
+	void ParticleBuoyancyForceGenerator::updateForce(std::shared_ptr<Particle> particle, const double duration) const
 	{
 		//the particle is aproximated by a cube of equal volume
 		double cubeEdge = pow(m_objectVolume, 1 / 3);

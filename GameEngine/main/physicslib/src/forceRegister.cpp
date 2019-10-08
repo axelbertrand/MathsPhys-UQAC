@@ -4,21 +4,20 @@
 
 namespace physicslib
 {
-	ForceRegister::ForceRecord::ForceRecord(Particle& particle, ParticleForceGenerator& forceGenerator)
-		: particle(&particle)
-		, forceGenerator(&forceGenerator)
+	ForceRegister::ForceRecord::ForceRecord(std::shared_ptr<Particle> particle, std::shared_ptr<ParticleForceGenerator> forceGenerator)
+		: particle(particle), forceGenerator(forceGenerator)
 	{
 	}
 
-	void ForceRegister::add(ForceRecord& record)
+	void ForceRegister::add(const ForceRecord& record)
 	{
 		m_register.push_back(record);
 	}
 
-	void ForceRegister::remove(Particle* particle)
+	void ForceRegister::remove(std::shared_ptr<Particle> particle)
 	{
 		auto last = std::remove_if(m_register.begin(), m_register.end(),
-			[particle](ForceRecord& record)
+			[particle](const ForceRecord& record)
 			{
 				return record.particle == particle;
 			});
