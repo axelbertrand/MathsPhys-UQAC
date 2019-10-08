@@ -9,13 +9,11 @@ namespace physicslib
 	{
 	public:
 		AnchoredSpringForceGenerator(Vector3 anchorPosition, double elasticity, double restingLength);
-		virtual ~AnchoredSpringForceGenerator();
 
-		void updateForce(Particle* particle, double duration) override;
-
+		void updateForce(std::shared_ptr<Particle> particle, const double duration) const override;
 	private:
-		Vector3 m_anchorPosition;
-		double m_elasticity;
-		double m_restingLength;
+		const Vector3 m_anchorPosition;
+		const double m_elasticity;
+		const double m_restingLength;
 	};
 }

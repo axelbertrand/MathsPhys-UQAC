@@ -11,11 +11,11 @@ namespace physicslib
 		ParticleStiffSpringForceGenerator(Vector3 anchorPosition, double elasticity, double damping);
 		virtual ~ParticleStiffSpringForceGenerator();
 
-		void updateForce(Particle* particle, double duration) override;
+		void updateForce(std::shared_ptr<Particle> particle, const double duration) const override;
 
 	private:
-		Vector3 m_anchorPosition;
-		double m_elasticity;
-		double m_damping;
+		const Vector3 m_anchorPosition;
+		const double m_elasticity;
+		const double m_damping;
 	};
 }

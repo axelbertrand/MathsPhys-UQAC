@@ -7,7 +7,7 @@ namespace physicslib
 	{
 	public:
 
-		static const unsigned int PARTICLE_RADIUS = 3;
+		static const unsigned int PARTICLE_RADIUS = 10;
 		Particle(double inverseMass = 0, physicslib::Vector3 position = physicslib::Vector3(),
 			physicslib::Vector3 speed = physicslib::Vector3(), physicslib::Vector3 acceleration = physicslib::Vector3());
 		Particle(Particle const& anotherParticle);

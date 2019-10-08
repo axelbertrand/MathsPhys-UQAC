@@ -21,9 +21,11 @@ const char* fragmentShaderSource = "#version 330 core\n"
 "{\n"
 "   vec2 fragCoord = gl_FragCoord.xy;"
 "	float squareDistFromCenter = pow(fragCoord.x - circleCenter.x, 2) + pow(fragCoord.y - circleCenter.y, 2);\n"
-"   if (squareDistFromCenter > circleRadius)\n"
+"   if (squareDistFromCenter > pow(circleRadius,2))\n"
 "   {\n"
 "       discard;\n"
 "   }\n"
+"   else\n"
 "   FragColor = vec4(1.0f, 1.0f, 1.0f, 1.0f);\n"
+
 "}\n\0";

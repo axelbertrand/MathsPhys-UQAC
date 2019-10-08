@@ -1,4 +1,4 @@
-#include "../include/particleContactResolver.hpp"
+#include "collisions/particleContactResolver.hpp"
 
 namespace physicslib
 {
