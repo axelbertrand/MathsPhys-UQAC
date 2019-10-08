@@ -18,7 +18,7 @@ namespace physicslib
 			std::shared_ptr<ParticleForceGenerator> forceGenerator;
 		};
 		void add(const ForceRecord& record);
-		void remove(std::shared_ptr<Particle> particle);
+		void clear();
 
 		void updateAllForces(double duration);
 	private:

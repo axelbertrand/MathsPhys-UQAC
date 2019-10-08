@@ -14,15 +14,9 @@ namespace physicslib
 		m_register.push_back(record);
 	}
 
-	void ForceRegister::remove(std::shared_ptr<Particle> particle)
+	void ForceRegister::clear()
 	{
-		auto last = std::remove_if(m_register.begin(), m_register.end(),
-			[particle](const ForceRecord& record)
-			{
-				return record.particle == particle;
-			});
-
-		m_register.erase(last, m_register.end());
+		m_register.clear();
 	}
 
 	void ForceRegister::updateAllForces(double duration)

@@ -1,11 +1,19 @@
 #include "../include/particle.hpp"
 #include <math.h>
+#include <random>
 
 namespace physicslib
 {
 	Particle::Particle(double inverseMass, physicslib::Vector3 position, physicslib::Vector3 speed, physicslib::Vector3 acceleration) :
 		m_inverseMass(inverseMass), m_position(position), m_speed(speed), m_acceleration(acceleration), m_forceAccumulator()
 	{
+		std::random_device rd;  //Will be used to obtain a seed for the random number engine
+		std::mt19937 gen(rd()); //Standard mersenne_twister_engine seeded with rd()
+		std::uniform_real_distribution<> dis(0.0, 1.0);
+		double red = dis(gen);
+		double green = dis(gen);
+		double blue = dis(gen);
+		m_color = Vector3(red, green, blue);
 	}
 
 	Particle::Particle(Particle const& anotherParticle) :
@@ -52,6 +60,11 @@ namespace physicslib
 	void Particle::addForce(const physicslib::Vector3& force)
 	{
 		m_forceAccumulator += force;
+	}
+
+	physicslib::Vector3 Particle::getColor() const
+	{
+		return m_color;
 	}
 
 	void Particle::clearAccumulator()
