@@ -1,4 +1,4 @@
-#include "anchoredSpringForceGenerator.hpp"
+#include "forceGenerator/anchoredSpringForceGenerator.hpp"
 
 namespace physicslib
 {

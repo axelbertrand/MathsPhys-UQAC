@@ -1,4 +1,4 @@
-#include "../include/particleCable.hpp"
+#include "collisions/particleCable.hpp"
 
 namespace physicslib
 {

@@ -1,4 +1,5 @@
-#include "particleBuoyancyForceGenerator.hpp"
+#include "forceGenerator/particleBuoyancyForceGenerator.hpp"
+
 #include <math.h>
 
 namespace physicslib

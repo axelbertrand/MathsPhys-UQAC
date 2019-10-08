@@ -5,12 +5,12 @@
 
 #include "openGlWrapper.hpp"
 #include "particle.hpp"
-#include "particleForceGenerator.hpp"
-#include "gravityForceGenerator.hpp"
-#include "dragForceGenerator.hpp"
-#include "forceRegister.hpp"
-#include "contactRegister.hpp"
-#include "particleContact.hpp"
+#include "forceGenerator/particleForceGenerator.hpp"
+#include "forceGenerator/gravityForceGenerator.hpp"
+#include "forceGenerator/dragForceGenerator.hpp"
+#include "forceGenerator/forceRegister.hpp"
+#include "collisions/contactRegister.hpp"
+#include "collisions/particleContact.hpp"
 #include "../include/inputsManager.hpp"
 
 class GameWorld

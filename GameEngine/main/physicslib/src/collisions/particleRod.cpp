@@ -1,4 +1,4 @@
-#include "../include/particleRod.hpp"
+#include "collisions/particleRod.hpp"
 
 namespace physicslib
 {

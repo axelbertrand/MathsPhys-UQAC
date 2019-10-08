@@ -1,4 +1,4 @@
-#include "particleSpringForceGenerator.hpp"
+#include "forceGenerator/particleSpringForceGenerator.hpp"
 
 namespace physicslib 
 {

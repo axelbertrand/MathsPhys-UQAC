@@ -1,4 +1,4 @@
-#include "bungeeSpringForceGenerator.hpp"
+#include "forceGenerator/bungeeSpringForceGenerator.hpp"
 
 namespace physicslib
 {

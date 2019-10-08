@@ -1,4 +1,4 @@
-#include "../include/particleContact.hpp"
+#include "collisions/particleContact.hpp"
 #include <algorithm>
 
 namespace physicslib
