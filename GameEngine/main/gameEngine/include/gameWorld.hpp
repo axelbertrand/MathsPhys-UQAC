@@ -11,7 +11,9 @@
 #include "forceRegister.hpp"
 #include "contactRegister.hpp"
 #include "particleContact.hpp"
+#include "blob.hpp"
 #include "../include/inputsManager.hpp"
+
 
 class GameWorld
 {
@@ -34,6 +36,7 @@ private:
 	GLFWwindow * const m_mainWindow;
 	InputsManager m_inputsManager;
 	std::vector<std::shared_ptr<physicslib::Particle>> m_particles;
+	/*std::vector<std::shared_ptr<physicslib::Blob>> m_blobs;*/
 
 	std::vector<InputsManager::Intention> getPendingIntentions();
 

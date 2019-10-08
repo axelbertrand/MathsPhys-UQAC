@@ -96,11 +96,49 @@ void GameWorld::processIntention(const InputsManager::Intention intention)
 		forceRegister.add(physicslib::ForceRegister::ForceRecord(*particle, dragGenerator));
 		m_particles.push_back(particle);
 	}
+
+	else if (intention == InputsManager::CREATE_TEST_BLOB)
+	{
+		std::shared_ptr<physicslib::Particle> core = std::make_shared<physicslib::Particle>(1, physicslib::Vector3(10, 10, 0), physicslib::Vector3(100, 100, 0), physicslib::Vector3());
+		m_particles.push_back(core);
+		std::shared_ptr<physicslib::Particle> p1 = std::make_shared<physicslib::Particle>(1, physicslib::Vector3(10, 20, 0), physicslib::Vector3(), physicslib::Vector3());
+		m_particles.push_back(p1);
+		std::shared_ptr<physicslib::Particle> p2 = std::make_shared<physicslib::Particle>(1, physicslib::Vector3(20, 10, 0), physicslib::Vector3(), physicslib::Vector3());
+		m_particles.push_back(p2);
+		std::pair<std::shared_ptr<physicslib::Particle>, std::shared_ptr<physicslib::Particle>> link1 = std::make_pair(core, p1);
+		std::pair<std::shared_ptr<physicslib::Particle>, std::shared_ptr<physicslib::Particle>> link2 = std::make_pair(core, p2);
+		std::vector<std::shared_ptr<physicslib::Particle>> blob_particles;
+		blob_particles.push_back(p1);
+		blob_particles.push_back(p2);
+		std::vector<std::pair<std::shared_ptr<physicslib::Particle>, std::shared_ptr<physicslib::Particle>>> blob_links;
+		blob_links.push_back(link1);
+		blob_links.push_back(link2);
+		physicslib::Blob blob = (physicslib::Blob(core, blob_particles, blob_links, 1, 30));
+		auto blobForceRecords = blob.getForceRecords();
+		std::for_each(blobForceRecords.begin(), blobForceRecords.end(), 
+			[this](physicslib::ForceRegister::ForceRecord forceRecord)
+			{
+				forceRegister.add(forceRecord);
+			});
+	}
 }
 
 void GameWorld::updatePhysics(const double frametime)
 {
 	forceRegister.updateAllForces(frametime);
+
+	/*update blobs
+
+	auto blob = std::begin(m_blobs);
+	while (blob != std::end(m_blobs))
+	{
+		auto blobForceRecords = (*blob)->getForceRecords();
+		std::for_each(blobForceRecords.begin(), blobForceRecords.end(), [this](physicslib::ForceRegister::ForceRecord forceRecord)
+			{
+				forceRegister.add(forceRecord);
+			});
+		blob++;
+	}*/
 
 	// update the position of the particles
 	auto particle = std::begin(m_particles);
@@ -245,6 +283,10 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
 	else if (key == GLFW_KEY_E && action == GLFW_PRESS)
 	{
 		inputsManager->addIntention(InputsManager::Intention::CREATE_PARTICLE_THREE);
+	}
+	else if (key == GLFW_KEY_B && action == GLFW_PRESS)
+	{
+		inputsManager->addIntention(InputsManager::Intention::CREATE_TEST_BLOB);
 	}
 
 }
