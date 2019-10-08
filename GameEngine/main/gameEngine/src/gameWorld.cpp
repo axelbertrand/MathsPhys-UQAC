@@ -5,7 +5,7 @@
 #include <tuple>
 #include <cmath>
 
-#include "particleCable.hpp"
+#include "collisions/particleCable.hpp"
 
 #include "../include/shaderSources.hpp"
 
