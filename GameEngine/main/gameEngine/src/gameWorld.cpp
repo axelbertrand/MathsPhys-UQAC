@@ -13,9 +13,12 @@ GameWorld::GameWorld(): m_openGlWrapper(SCR_WIDTH, SCR_HEIGHT, WINDOW_TITLE), m_
 {
 	// Initialize graphics
 	m_openGlWrapper.setKeyboardCallback(m_mainWindow, keyCallback);
-	m_shadersProgramm = m_openGlWrapper.createShadersProgram(vertexShaderSource, fragmentShaderSource);
-	m_openGlWrapper.useShadersProgram(m_shadersProgramm);
-
+	m_shaderProgramms.insert(std::make_pair<ShaderProgrammType, opengl_wrapper::ShaderProgram_t>
+		(ShaderProgrammType::PARTICLE, m_openGlWrapper.createShadersProgram
+		(particleVertexShaderSource, particleFragmentShaderSource)));
+	m_shaderProgramms.insert(std::make_pair<ShaderProgrammType, opengl_wrapper::ShaderProgram_t>
+		(ShaderProgrammType::BACKGROUND, m_openGlWrapper.createShadersProgram
+		(backgroundVertexShaderSource, backgroundFragmentShaderSource)));
 	// Game variables
 	glfwSetWindowUserPointer(m_mainWindow, &m_inputsManager); //save the manager's pointer to the window to be able to access it in the inputs callback function
 }
@@ -149,20 +152,39 @@ void GameWorld::renderGame() const
 	// cleaning screen
 	m_openGlWrapper.clearCurrentWindow();
 
-	// drawing particles
-	auto buffers = generateBuffers();
-	std::vector<double> verticesBuffer = std::get<0>(buffers);
-	std::vector<unsigned int> indicesBuffer = std::get<1>(buffers);
-	auto openglBuffers = m_openGlWrapper.createAndBindDataBuffers(verticesBuffer, indicesBuffer);
-	m_openGlWrapper.setUniformShaderVariable(m_shadersProgramm, "circleRadius", physicslib::Particle::PARTICLE_RADIUS);
-	m_openGlWrapper.draw(GL_TRIANGLES, static_cast<unsigned int>(indicesBuffer.size()));
-	m_openGlWrapper.cleanAndDeleteDataBuffers(openglBuffers);
+	// drawings
+	drawBackground();
+	drawParticles();
 
 	// swapping the double buffers
 	m_openGlWrapper.swapGraphicalBuffers(m_mainWindow);
 }
 
-std::tuple<std::vector<double>, std::vector<unsigned int>> GameWorld::generateBuffers() const
+void GameWorld::drawBackground() const
+{
+	m_openGlWrapper.useShadersProgram(m_shaderProgramms.at(ShaderProgrammType::BACKGROUND));
+	auto buffers = generateBackgroundBuffers();
+	std::vector<double> verticesBuffer = std::get<0>(buffers);
+	std::vector<unsigned int> indicesBuffer = std::get<1>(buffers);
+	auto openglBuffers = m_openGlWrapper.createAndBindDataBuffers(verticesBuffer, indicesBuffer);
+	m_openGlWrapper.draw(GL_TRIANGLES, static_cast<unsigned int>(indicesBuffer.size()));
+	m_openGlWrapper.cleanAndDeleteDataBuffers(openglBuffers);
+}
+
+void GameWorld::drawParticles() const
+{
+	m_openGlWrapper.useShadersProgram(m_shaderProgramms.at(ShaderProgrammType::PARTICLE));
+	auto buffers = generateParticlesBuffers();
+	std::vector<double> verticesBuffer = std::get<0>(buffers);
+	std::vector<unsigned int> indicesBuffer = std::get<1>(buffers);
+	auto openglBuffers = m_openGlWrapper.createAndBindDataBuffers(verticesBuffer, indicesBuffer);
+	m_openGlWrapper.setUniformShaderVariable(m_shaderProgramms.at(ShaderProgrammType::PARTICLE), "circleRadius",
+		physicslib::Particle::PARTICLE_RADIUS);
+	m_openGlWrapper.draw(GL_TRIANGLES, static_cast<unsigned int>(indicesBuffer.size()));
+	m_openGlWrapper.cleanAndDeleteDataBuffers(openglBuffers);
+}
+
+std::tuple<std::vector<double>, std::vector<unsigned int>> GameWorld::generateParticlesBuffers() const
 {
 	std::vector<double> vertices;
 	std::vector<unsigned int> indices;
@@ -223,6 +245,51 @@ std::tuple<std::vector<double>, std::vector<unsigned int>> GameWorld::generateBu
 
 		startIndex += 4;
 	}
+	return { vertices, indices };
+}
+
+std::tuple<std::vector<double>, std::vector<unsigned int>> GameWorld::generateBackgroundBuffers() const
+{
+	std::vector<double> vertices;
+	std::vector<unsigned int> indices;
+
+	vertices.push_back(0);
+	vertices.push_back(FLOOR_LEVEL);
+	vertices.push_back(0);
+	vertices.push_back(0);
+	vertices.push_back(1);
+	vertices.push_back(0);
+
+	vertices.push_back(SCR_WIDTH);
+	vertices.push_back(FLOOR_LEVEL);
+	vertices.push_back(0);
+	vertices.push_back(0);
+	vertices.push_back(1);
+	vertices.push_back(0);
+
+	vertices.push_back(SCR_WIDTH);
+	vertices.push_back(0);
+	vertices.push_back(0);
+	vertices.push_back(0);
+	vertices.push_back(1);
+	vertices.push_back(0);
+
+	vertices.push_back(0);
+	vertices.push_back(0);
+	vertices.push_back(0);
+	vertices.push_back(0);
+	vertices.push_back(1);
+	vertices.push_back(0);
+
+	// first triangle
+	indices.push_back(0);
+	indices.push_back(1);
+	indices.push_back(3);
+
+	// second triangle
+	indices.push_back(1);
+	indices.push_back(2);
+	indices.push_back(3);
 
 	return { vertices, indices };
 }
