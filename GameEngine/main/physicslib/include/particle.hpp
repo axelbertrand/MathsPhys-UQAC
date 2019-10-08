@@ -6,6 +6,8 @@ namespace physicslib
 	class Particle
 	{
 	public:
+
+		static const unsigned int PARTICLE_RADIUS = 3;
 		Particle(double inverseMass = 0, physicslib::Vector3 position = physicslib::Vector3(),
 			physicslib::Vector3 speed = physicslib::Vector3(), physicslib::Vector3 acceleration = physicslib::Vector3());
 		Particle(Particle const& anotherParticle);
@@ -19,8 +21,11 @@ namespace physicslib
 		// Updates position, speed, acceleration using Newton laws
 		void integrate(double frameTime = 0.0333333);
 		void addForce(const physicslib::Vector3& force);
+		void setSpeed(const physicslib::Vector3& newSpeed);
+		void setPosition(const physicslib::Vector3& newPosition);
 		void clearAccumulator();
 		bool isVisible(unsigned int xMax, unsigned int yMax) const;
+		bool isInContactWith(const Particle particle) const;
 
 		std::string toString() const;
 

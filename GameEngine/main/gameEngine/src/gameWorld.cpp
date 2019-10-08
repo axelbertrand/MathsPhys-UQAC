@@ -77,14 +77,14 @@ void GameWorld::processIntention(const InputsManager::Intention intention)
 	}
 	else if (intention == InputsManager::CREATE_PARTICLE_ONE)
 	{
-		std::shared_ptr<physicslib::Particle> particle = std::make_shared<physicslib::Particle>(50, physicslib::Vector3(10, 10, 0), physicslib::Vector3(100, 50, 0), physicslib::Vector3());
+		std::shared_ptr<physicslib::Particle> particle = std::make_shared<physicslib::Particle>(1, physicslib::Vector3(10, 10, 0), physicslib::Vector3(100, 50, 0), physicslib::Vector3());
 		forceRegister.add(physicslib::ForceRegister::ForceRecord(*particle, gravityGenerator));
 		forceRegister.add(physicslib::ForceRegister::ForceRecord(*particle, dragGenerator));
 		m_particles.push_back(particle);
 	}
 	else if (intention == InputsManager::CREATE_PARTICLE_TWO)
 	{
-		std::shared_ptr<physicslib::Particle> particle = std::make_shared<physicslib::Particle>(10, physicslib::Vector3(10, 400, 0), physicslib::Vector3(100, 0, 0), physicslib::Vector3());
+		std::shared_ptr<physicslib::Particle> particle = std::make_shared<physicslib::Particle>(1, physicslib::Vector3(10, 400, 0), physicslib::Vector3(100, 0, 0), physicslib::Vector3());
 		forceRegister.add(physicslib::ForceRegister::ForceRecord(*particle, gravityGenerator));
 		forceRegister.add(physicslib::ForceRegister::ForceRecord(*particle, dragGenerator));
 		m_particles.push_back(particle);
@@ -117,6 +117,31 @@ void GameWorld::updatePhysics(const double frametime)
 			++particle;
 		}
 	}
+
+	//look for collisions
+	auto particle1 = std::begin(m_particles);
+	auto particle2 = std::begin(m_particles);
+	while (particle1 != std::end(m_particles))
+	{
+		while (particle2 != particle1)
+		{
+			if ((*particle1)->isInContactWith(*(particle2->get())))
+			{
+				physicslib::ParticleContact particleContact = physicslib::ParticleContact(particle1->get(), particle2->get(), 1);
+				contactRegister.add(particleContact);
+			}
+			particle2++;
+		}
+		/*if ((*particle1)->getPosition().getY() < 10)
+		{
+			physicslib::Particle particleGround = physicslib::Particle(0, physicslib::Vector3((*particle1)->getPosition().getX(), (*particle1)->getPosition().getY()-1, 0));
+			physicslib::ParticleContact particleContact = physicslib::ParticleContact(particle1->get(), &particleGround, 0.5);
+			contactRegister.add(particleContact);
+		}*/
+		particle1++;
+	}
+	contactRegister.resolveContacts(frametime);
+	contactRegister.clear();
 }
 
 void GameWorld::renderGame() const
@@ -129,7 +154,7 @@ void GameWorld::renderGame() const
 	std::vector<double> verticesBuffer = std::get<0>(buffers);
 	std::vector<unsigned int> indicesBuffer = std::get<1>(buffers);
 	auto openglBuffers = m_openGlWrapper.createAndBindDataBuffers(verticesBuffer, indicesBuffer);
-	m_openGlWrapper.setUniformShaderVariable(m_shadersProgramm, "circleRadius", PARTICLE_RADIUS);
+	m_openGlWrapper.setUniformShaderVariable(m_shadersProgramm, "circleRadius", physicslib::Particle::PARTICLE_RADIUS);
 	m_openGlWrapper.draw(GL_TRIANGLES, static_cast<unsigned int>(indicesBuffer.size()));
 	m_openGlWrapper.cleanAndDeleteDataBuffers(openglBuffers);
 
@@ -148,7 +173,7 @@ std::tuple<std::vector<double>, std::vector<unsigned int>> GameWorld::generateBu
 		double x = particle->getPosition().getX();
 		double y = particle->getPosition().getY();
 
-		double squareStep = std::floor((PARTICLE_RADIUS / 2));
+		double squareStep = std::floor((physicslib::Particle::PARTICLE_RADIUS / 2));
 		double topX = std::min(x + squareStep, static_cast<double>(SCR_WIDTH));
 		double bottomX = std::max(x - squareStep, 0.0);
 		double topY = std::min(y + squareStep, static_cast<double>(SCR_HEIGHT));

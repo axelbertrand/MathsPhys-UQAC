@@ -30,11 +30,21 @@ namespace physicslib
 		return true;
 	}
 
+	//indicates whether or not there is a contact between these two particles
+	bool Particle::isInContactWith(const Particle particle) const
+	{
+		if ((m_position - particle.getPosition()).getNorm() <= 2 * PARTICLE_RADIUS)
+		{
+			return true;
+		}
+		return false;
+	}
+
 	// Updates position, speed, acceleration using Newton laws
 	void Particle::integrate(double frameTime)
 	{
-		m_position += m_speed * frameTime;
-		m_speed = m_speed + m_acceleration * frameTime;
+		setPosition(m_position + m_speed * frameTime);
+		setSpeed(m_speed + m_acceleration * frameTime);
 		m_acceleration = m_forceAccumulator;
 		clearAccumulator();
 	}
@@ -47,6 +57,16 @@ namespace physicslib
 	void Particle::clearAccumulator()
 	{
 		m_forceAccumulator = physicslib::Vector3();
+	}
+
+
+	void Particle::setSpeed(const physicslib::Vector3& newSpeed) 
+	{
+		m_speed = newSpeed;
+	}
+	void Particle::setPosition(const physicslib::Vector3& newPosition)
+	{
+		m_position = newPosition;
 	}
 
 	double Particle::getInverseMass() const
