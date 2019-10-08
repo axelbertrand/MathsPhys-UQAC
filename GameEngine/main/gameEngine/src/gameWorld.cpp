@@ -5,6 +5,8 @@
 #include <tuple>
 #include <cmath>
 
+#include "particleCable.hpp"
+
 #include "../include/shaderSources.hpp"
 
 void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
@@ -125,11 +127,9 @@ void GameWorld::updatePhysics(const double frametime)
 	{
 		while (particle2 != particle1)
 		{
-			if ((*particle1)->isInContactWith(*(particle2->get())))
-			{
-				physicslib::ParticleContact particleContact = physicslib::ParticleContact(particle1->get(), particle2->get(), 1);
-				contactRegister.add(particleContact);
-			}
+			physicslib::ParticleCable contactGenerator(*(*particle1), *(*particle2), 100, 1);
+			contactGenerator.addContact(contactRegister);
+
 			particle2++;
 		}
 		/*if ((*particle1)->getPosition().getY() < 10)

@@ -10,7 +10,6 @@ namespace physicslib
 		ParticleLink(Particle particle1, Particle particle2);
 		virtual ~ParticleLink();
 
-		virtual void addContact();
 		virtual double getCurrentLength();
 
 	protected:

@@ -9,7 +9,7 @@ namespace physicslib
 	public:
 		ParticleRod(Particle particle1, Particle particle2, double length);
 		virtual ~ParticleRod();
-		void addContact();
+		void addContact(ContactRegister& contactRegister);
 
 	private:
 		double m_length;

@@ -1,4 +1,6 @@
-#include "../include/particleCable.hpp"
+#include "particleCable.hpp"
+
+#include "particleContact.hpp"
 
 namespace physicslib
 {
@@ -7,8 +9,17 @@ namespace physicslib
 	{
 	}
 
-	void ParticleLink::addContact()
+	ParticleCable::~ParticleCable()
 	{
+	}
 
+	void ParticleCable::addContact(ContactRegister& contactRegister)
+	{
+		if (!m_particles[0].isInContactWith(m_particles[1]))
+		{
+			return;
+		}
+
+		contactRegister.add(ParticleContact(&m_particles[0], &m_particles[1], m_restitutionCoef));
 	}
 }
