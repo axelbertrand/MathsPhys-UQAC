@@ -19,6 +19,7 @@ GameWorld::GameWorld(): m_openGlWrapper(SCR_WIDTH, SCR_HEIGHT, WINDOW_TITLE), m_
 	m_shaderProgramms.insert(std::make_pair<ShaderProgrammType, opengl_wrapper::ShaderProgram_t>
 		(ShaderProgrammType::BACKGROUND, m_openGlWrapper.createShadersProgram
 		(backgroundVertexShaderSource, backgroundFragmentShaderSource)));
+
 	// Game variables
 	glfwSetWindowUserPointer(m_mainWindow, &m_inputsManager); //save the manager's pointer to the window to be able to access it in the inputs callback function
 }
@@ -80,48 +81,36 @@ void GameWorld::processIntention(const InputsManager::Intention intention)
 	}
 	else if (intention == InputsManager::CREATE_PARTICLE_ONE)
 	{
-		std::shared_ptr<physicslib::Particle> particle = std::make_shared<physicslib::Particle>(1, physicslib::Vector3(10, 10, 0), physicslib::Vector3(100, 50, 0), physicslib::Vector3());
-		forceRegister.add(physicslib::ForceRegister::ForceRecord(particle, gravityGenerator));
-		forceRegister.add(physicslib::ForceRegister::ForceRecord(particle, dragGenerator));
+		std::shared_ptr<physicslib::Particle> particle = std::make_shared<physicslib::Particle>
+			(1, physicslib::Vector3(10, 10, 0), physicslib::Vector3(100, 50, 0), physicslib::Vector3());
 		m_particles.push_back(particle);
 	}
 	else if (intention == InputsManager::CREATE_PARTICLE_TWO)
 	{
-		std::shared_ptr<physicslib::Particle> particle = std::make_shared<physicslib::Particle>(1, physicslib::Vector3(10, 400, 0), physicslib::Vector3(100, 0, 0), physicslib::Vector3());
-		forceRegister.add(physicslib::ForceRegister::ForceRecord(particle, gravityGenerator));
-		forceRegister.add(physicslib::ForceRegister::ForceRecord(particle, dragGenerator));
+		std::shared_ptr<physicslib::Particle> particle = std::make_shared<physicslib::Particle>
+			(1, physicslib::Vector3(10, 400, 0), physicslib::Vector3(100, 0, 0), physicslib::Vector3());
 		m_particles.push_back(particle);
 	}
 	else if (intention == InputsManager::CREATE_PARTICLE_THREE)
 	{
-		std::shared_ptr<physicslib::Particle> particle = std::make_shared<physicslib::Particle>(1, physicslib::Vector3(10, 10, 0), physicslib::Vector3(100, 100, 0), physicslib::Vector3());
-		forceRegister.add(physicslib::ForceRegister::ForceRecord(particle, gravityGenerator));
-		forceRegister.add(physicslib::ForceRegister::ForceRecord(particle, dragGenerator));
+		std::shared_ptr<physicslib::Particle> particle = std::make_shared<physicslib::Particle>
+			(1, physicslib::Vector3(10, 10, 0), physicslib::Vector3(100, 100, 0), physicslib::Vector3());
 		m_particles.push_back(particle);
 	}
 }
 
 void GameWorld::updatePhysics(const double frametime)
 {
-	forceRegister.updateAllForces(frametime);
+	// Generates all forces and add them in the force register
+	generateAllForces();
+
+	// applies the forces inside the force register
+	m_forceRegister.updateAllForces(frametime);
 
 	// update the position of the particles
-	auto particle = std::begin(m_particles);
-	while (particle != std::end(m_particles))
-	{
-		(*particle)->integrate(frametime); //use last frame time for integration
-		if (!(*particle)->isVisible(SCR_WIDTH, SCR_HEIGHT))
-		{
-			forceRegister.remove(*particle);
-			particle = m_particles.erase(particle);
-		}
-		else
-		{
-			++particle;
-		}
-	}
+	updateParticlesPosition(frametime);
 
-	//look for collisions
+	// looking for collisions 
 	auto particle1 = std::begin(m_particles);
 	auto particle2 = std::begin(m_particles);
 	while (particle1 != std::end(m_particles))
@@ -131,7 +120,7 @@ void GameWorld::updatePhysics(const double frametime)
 			if ((*particle1)->isInContactWith(*(particle2->get())))
 			{
 				physicslib::ParticleContact particleContact = physicslib::ParticleContact(particle1->get(), particle2->get(), 1);
-				contactRegister.add(particleContact);
+				m_contactRegister.add(particleContact);
 			}
 			particle2++;
 		}
@@ -143,8 +132,43 @@ void GameWorld::updatePhysics(const double frametime)
 		}*/
 		particle1++;
 	}
-	contactRegister.resolveContacts(frametime);
-	contactRegister.clear();
+	m_contactRegister.resolveContacts(frametime);
+
+	// cleaning registers
+	m_contactRegister.clear();
+	m_forceRegister.clear();
+}
+
+void GameWorld::generateAllForces()
+{
+	generateGravityAndDragForces();
+}
+
+void GameWorld::generateGravityAndDragForces()
+{
+	std::for_each(m_particles.begin(), m_particles.end(),
+		[this](const auto& particle)
+		{
+			m_forceRegister.add(physicslib::ForceRegister::ForceRecord(particle, gravityGenerator));
+			m_forceRegister.add(physicslib::ForceRegister::ForceRecord(particle, dragGenerator));
+		});
+}
+
+void GameWorld::updateParticlesPosition(const double frametime)
+{
+	auto particle = std::begin(m_particles);
+	while (particle != std::end(m_particles))
+	{
+		(*particle)->integrate(frametime); //use last frame time for integration
+		if (!(*particle)->isVisible(SCR_WIDTH, SCR_HEIGHT))
+		{
+			particle = m_particles.erase(particle);
+		}
+		else
+		{
+			++particle;
+		}
+	}
 }
 
 void GameWorld::renderGame() const

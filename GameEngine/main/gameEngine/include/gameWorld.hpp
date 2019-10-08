@@ -32,8 +32,8 @@ private:
 	const unsigned int FLOOR_LEVEL = 10;
 	const std::string WINDOW_TITLE = "Game Engine Demo";
 	std::unordered_map<ShaderProgrammType, opengl_wrapper::ShaderProgram_t> m_shaderProgramms;
-	physicslib::ForceRegister forceRegister;
-	physicslib::ContactRegister contactRegister;
+	physicslib::ForceRegister m_forceRegister;
+	physicslib::ContactRegister m_contactRegister;
 	std::shared_ptr<physicslib::GravityForceGenerator> gravityGenerator = std::make_shared<physicslib::GravityForceGenerator>(physicslib::Vector3(0, -20, 0));
 	std::shared_ptr<physicslib::DragForceGenerator> dragGenerator = std::make_shared<physicslib::DragForceGenerator>(0.03, 0);
 
@@ -47,6 +47,9 @@ private:
 	void processInputs(const std::vector<InputsManager::Intention>& pendingIntentions);
 	void processIntention(InputsManager::Intention intention);
 	void updatePhysics(const double frametime);
+	void generateAllForces();
+	void generateGravityAndDragForces();
+	void updateParticlesPosition(const double frametime);
 
 	void renderGame() const;
 	void drawBackground() const;
