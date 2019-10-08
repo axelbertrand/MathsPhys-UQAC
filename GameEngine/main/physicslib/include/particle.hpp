@@ -25,7 +25,8 @@ namespace physicslib
 		void setPosition(const physicslib::Vector3& newPosition);
 		void clearAccumulator();
 		bool isVisible(unsigned int xMax, unsigned int yMax) const;
-		bool isInContactWith(const Particle particle) const;
+		bool isInContactWith(const Particle& particle) const;
+		double getDistance(const Particle& particle) const;
 
 		std::string toString() const;
 

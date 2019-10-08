@@ -127,8 +127,14 @@ void GameWorld::updatePhysics(const double frametime)
 	{
 		while (particle2 != particle1)
 		{
-			physicslib::ParticleCable contactGenerator(*(*particle1), *(*particle2), 100, 1);
-			contactGenerator.addContact(contactRegister);
+			//physicslib::ParticleCable contactGenerator(**particle1, **particle2, 100, 1);
+			//contactGenerator.addContact(contactRegister);
+
+			if ((*particle1)->isInContactWith(**particle2) || (*particle1)->getDistance(**particle2) >= 100)
+			{
+				physicslib::ParticleContact particleContact(particle1->get(), particle2->get(), 1);
+				contactRegister.add(particleContact);
+			}
 
 			particle2++;
 		}

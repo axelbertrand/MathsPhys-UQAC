@@ -28,9 +28,14 @@ namespace physicslib
 	}
 
 	//indicates whether or not there is a contact between these two particles
-	bool Particle::isInContactWith(const Particle particle) const
+	bool Particle::isInContactWith(const Particle& particle) const
 	{
-		return ((m_position - particle.getPosition()).getNorm() <= 2. * PARTICLE_RADIUS);
+		return (getDistance(particle) <= 2. * PARTICLE_RADIUS);
+	}
+
+	double Particle::getDistance(const Particle& particle) const
+	{
+		return (m_position - particle.getPosition()).getNorm();
 	}
 
 	// Updates position, speed, acceleration using Newton laws

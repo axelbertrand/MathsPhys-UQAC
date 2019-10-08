@@ -15,11 +15,9 @@ namespace physicslib
 
 	void ParticleCable::addContact(ContactRegister& contactRegister)
 	{
-		if (!m_particles[0].isInContactWith(m_particles[1]))
+		if (m_particles[0].isInContactWith(m_particles[1]) || getCurrentLength() >= m_maxLength)
 		{
-			return;
+			contactRegister.add(ParticleContact(&m_particles[0], &m_particles[1], m_restitutionCoef));
 		}
-
-		contactRegister.add(ParticleContact(&m_particles[0], &m_particles[1], m_restitutionCoef));
 	}
 }

@@ -14,10 +14,12 @@ namespace physicslib
 	{
 		
 		calculateVariables();
-		//if (m_vs > 0)
+		if (m_vs >= 0)
 		{
-			resolveVelocity(frametime);
+			return;
 		}
+
+		resolveVelocity(frametime);
 		resolveInterpenetration();
 	}
 
@@ -25,7 +27,7 @@ namespace physicslib
 	{
 		m_contactNormal = (m_particles[0]->getSpeed() - m_particles[1]->getSpeed()).getNormalizedVector();
 		m_vs = m_contactNormal * (m_particles[0]->getSpeed() - m_particles[1]->getSpeed());
-		m_penetration = 2 * Particle::PARTICLE_RADIUS - (m_particles[0]->getPosition() - m_particles[1]->getPosition()).getNorm();
+		m_penetration = 2. * Particle::PARTICLE_RADIUS - (m_particles[0]->getPosition() - m_particles[1]->getPosition()).getNorm();
 		if (m_penetration < 0)
 		{
 			m_penetration = 0;

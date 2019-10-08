@@ -15,6 +15,6 @@ namespace physicslib
 
 	double ParticleLink::getCurrentLength()
 	{
-		return (m_particles[0].getPosition() - m_particles[1].getPosition()).getNorm();
+		return m_particles[0].getDistance(m_particles[1]);
 	}
 }
