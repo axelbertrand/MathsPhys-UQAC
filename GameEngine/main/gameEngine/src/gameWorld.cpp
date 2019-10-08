@@ -166,7 +166,7 @@ void GameWorld::drawBackground() const
 	auto buffers = generateBackgroundBuffers();
 	std::vector<double> verticesBuffer = std::get<0>(buffers);
 	std::vector<unsigned int> indicesBuffer = std::get<1>(buffers);
-	auto openglBuffers = m_openGlWrapper.createAndBindDataBuffers(verticesBuffer, indicesBuffer);
+	auto openglBuffers = m_openGlWrapper.createAndBindBackgroundDataBuffers(verticesBuffer, indicesBuffer);
 	m_openGlWrapper.draw(GL_TRIANGLES, static_cast<unsigned int>(indicesBuffer.size()));
 	m_openGlWrapper.cleanAndDeleteDataBuffers(openglBuffers);
 }
@@ -177,7 +177,7 @@ void GameWorld::drawParticles() const
 	auto buffers = generateParticlesBuffers();
 	std::vector<double> verticesBuffer = std::get<0>(buffers);
 	std::vector<unsigned int> indicesBuffer = std::get<1>(buffers);
-	auto openglBuffers = m_openGlWrapper.createAndBindDataBuffers(verticesBuffer, indicesBuffer);
+	auto openglBuffers = m_openGlWrapper.createAndBindParticlesDataBuffers(verticesBuffer, indicesBuffer);
 	m_openGlWrapper.setUniformShaderVariable(m_shaderProgramms.at(ShaderProgrammType::PARTICLE), "circleRadius",
 		physicslib::Particle::PARTICLE_RADIUS);
 	m_openGlWrapper.draw(GL_TRIANGLES, static_cast<unsigned int>(indicesBuffer.size()));
@@ -194,6 +194,9 @@ std::tuple<std::vector<double>, std::vector<unsigned int>> GameWorld::generatePa
 	{
 		double x = particle->getPosition().getX();
 		double y = particle->getPosition().getY();
+		double red = particle->getColor().getX();
+		double green = particle->getColor().getY();
+		double blue = particle->getColor().getZ();
 
 		double squareStep = physicslib::Particle::PARTICLE_RADIUS;
 		double topX = std::min(x + squareStep, static_cast<double>(SCR_WIDTH));
@@ -208,6 +211,9 @@ std::tuple<std::vector<double>, std::vector<unsigned int>> GameWorld::generatePa
 		vertices.push_back(x);
 		vertices.push_back(y);
 		vertices.push_back(0);
+		vertices.push_back(red);
+		vertices.push_back(green);
+		vertices.push_back(blue);
 
 		// bottom right
 		vertices.push_back(topX);
@@ -216,6 +222,9 @@ std::tuple<std::vector<double>, std::vector<unsigned int>> GameWorld::generatePa
 		vertices.push_back(x);
 		vertices.push_back(y);
 		vertices.push_back(0);
+		vertices.push_back(red);
+		vertices.push_back(green);
+		vertices.push_back(blue);
 
 		// bottom left
 		vertices.push_back(bottomX);
@@ -224,6 +233,9 @@ std::tuple<std::vector<double>, std::vector<unsigned int>> GameWorld::generatePa
 		vertices.push_back(x);
 		vertices.push_back(y);
 		vertices.push_back(0);
+		vertices.push_back(red);
+		vertices.push_back(green);
+		vertices.push_back(blue);
 
 		// top left
 		vertices.push_back(bottomX);
@@ -232,6 +244,9 @@ std::tuple<std::vector<double>, std::vector<unsigned int>> GameWorld::generatePa
 		vertices.push_back(x);
 		vertices.push_back(y);
 		vertices.push_back(0);
+		vertices.push_back(red);
+		vertices.push_back(green);
+		vertices.push_back(blue);
 
 		// first triangle
 		indices.push_back(startIndex);

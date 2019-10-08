@@ -14,6 +14,7 @@ namespace physicslib
 		virtual ~Particle();
 
 		physicslib::Vector3 getPosition() const;
+		physicslib::Vector3 getColor() const;
 		physicslib::Vector3 getSpeed() const;
 		physicslib::Vector3 getAcceleration() const;
 		double getInverseMass() const;
@@ -35,5 +36,6 @@ namespace physicslib
 		physicslib::Vector3 m_speed;
 		physicslib::Vector3 m_acceleration;
 		physicslib::Vector3 m_forceAccumulator;
+		physicslib::Vector3 m_color;
 	};
 }
