@@ -26,7 +26,6 @@ GameWorld::GameWorld(): m_openGlWrapper(SCR_WIDTH, SCR_HEIGHT, WINDOW_TITLE), m_
 
 void GameWorld::run()
 {
-	
 	double frametime = 0.033333;//first frame considered at 30fps
 	// game loops
 	while (!m_openGlWrapper.windowShouldClose(m_mainWindow))
@@ -53,7 +52,7 @@ void GameWorld::run()
 std::vector<InputsManager::Intention> GameWorld::getPendingIntentions()
 {
 	m_openGlWrapper.pollEvent(); //triggers the event callbacks
-	std::vector<InputsManager::Intention> pendingIntentions = m_inputsManager.getPendingIntentions();
+	std::vector<InputsManager::Intention> pendingIntentions = m_inputsManager.getPendingIntentions(m_mainWindow);
 	m_inputsManager.clearIntentions();
 	return pendingIntentions;
 }
@@ -79,11 +78,13 @@ void GameWorld::processIntention(const InputsManager::Intention intention)
 	{
 		m_openGlWrapper.closeMainWindow();
 	}
-	else if (intention == InputsManager::CREATE_PARTICLE_ONE)
+	else if (intention == InputsManager::CREATE_BLOB)
 	{
-		std::shared_ptr<physicslib::Particle> particle = std::make_shared<physicslib::Particle>
-			(1, physicslib::Vector3(30, 30, 0), physicslib::Vector3(100, 50, 0), physicslib::Vector3());
-		m_particles.push_back(particle);
+		std::shared_ptr<Blob> blob = createBlob(10);
+		if (m_mainBlob == nullptr)
+		{
+			m_mainBlob = blob;
+		}
 	}
 	else if (intention == InputsManager::CREATE_PARTICLE_TWO)
 	{
@@ -97,6 +98,54 @@ void GameWorld::processIntention(const InputsManager::Intention intention)
 			(1, physicslib::Vector3(30, 30, 0), physicslib::Vector3(100, 100, 0), physicslib::Vector3());
 		m_particles.push_back(particle);
 	}
+	else if (intention == InputsManager::MOVE_BLOB_BOTTOM && m_mainBlob != nullptr)
+	{
+		std::shared_ptr<physicslib::GravityForceGenerator> moveBottomGenerator = std::make_shared<physicslib::GravityForceGenerator>
+			(physicslib::Vector3(0, -100, 0));
+		physicslib::ForceRegister::ForceRecord record(m_mainBlob->getCore(), moveBottomGenerator);
+		m_forceRegister.add(record);
+	}
+	else if (intention == InputsManager::MOVE_BLOB_TOP && m_mainBlob != nullptr)
+	{
+		std::shared_ptr<physicslib::GravityForceGenerator> moveTopGenerator = std::make_shared<physicslib::GravityForceGenerator>
+			(physicslib::Vector3(0, 100, 0));
+		physicslib::ForceRegister::ForceRecord record(m_mainBlob->getCore(), moveTopGenerator);
+		m_forceRegister.add(record);
+	}
+	else if (intention == InputsManager::MOVE_BLOB_LEFT && m_mainBlob != nullptr)
+	{
+		std::shared_ptr<physicslib::GravityForceGenerator> moveLeftGenerator = std::make_shared<physicslib::GravityForceGenerator>
+			(physicslib::Vector3(-100, 0, 0));
+		physicslib::ForceRegister::ForceRecord record(m_mainBlob->getCore(), moveLeftGenerator);
+		m_forceRegister.add(record);
+	}
+	else if (intention == InputsManager::MOVE_BLOB_RIGHT && m_mainBlob != nullptr)
+	{
+		std::shared_ptr<physicslib::GravityForceGenerator> moveLeftGenerator = std::make_shared<physicslib::GravityForceGenerator>
+			(physicslib::Vector3(100, 0, 0));
+		physicslib::ForceRegister::ForceRecord record(m_mainBlob->getCore(), moveLeftGenerator);
+		m_forceRegister.add(record);
+	}
+}
+
+std::shared_ptr<Blob> GameWorld::createBlob(const unsigned int blobCount)
+{
+	auto coreParticle = std::make_shared<physicslib::Particle>
+		(1, physicslib::Vector3(400, 400, 0), physicslib::Vector3(0, 0, 0), physicslib::Vector3());
+	m_particles.push_back(coreParticle);
+
+	std::vector<std::shared_ptr<physicslib::Particle>> particles;
+	for (unsigned int count = 0; count < blobCount - 1; ++count)
+	{
+		auto particle = std::make_shared<physicslib::Particle>
+			(1, physicslib::Vector3(450+count, 400, 0), physicslib::Vector3(0, 0, 0), physicslib::Vector3());
+		particles.push_back(particle);
+		m_particles.push_back(particle);
+	}
+
+	std::shared_ptr<Blob> blob = std::make_shared<Blob>(coreParticle, particles, 10, 15);
+	m_blobs.push_back(blob);
+	return blob;
 }
 
 void GameWorld::updatePhysics(const double frametime)
@@ -175,6 +224,7 @@ void GameWorld::updatePhysics(const double frametime)
 void GameWorld::generateAllForces()
 {
 	generateGravityAndDragForces();
+	generateBlobsForces();
 }
 
 void GameWorld::generateGravityAndDragForces()
@@ -185,6 +235,23 @@ void GameWorld::generateGravityAndDragForces()
 			m_forceRegister.add(physicslib::ForceRegister::ForceRecord(particle, gravityGenerator));
 			m_forceRegister.add(physicslib::ForceRegister::ForceRecord(particle, dragGenerator));
 		});
+}
+
+void GameWorld::generateBlobsForces()
+{
+	if (!m_blobs.empty())
+	{
+		std::for_each(m_blobs.begin(), m_blobs.end(),
+			[this](const auto& blob)
+			{
+				auto records = blob->getForceRecords();
+				std::for_each(records.begin(), records.end(),
+					[this](const auto& record)
+					{
+						m_forceRegister.add(record);
+					});
+			});
+	}
 }
 
 void GameWorld::updateParticlesPosition(const double frametime)
@@ -353,6 +420,96 @@ std::tuple<std::vector<double>, std::vector<unsigned int>> GameWorld::generateBa
 	vertices.push_back(1);
 	vertices.push_back(0);
 
+	// 
+
+	vertices.push_back(RIGHT_WALL_LIMIT);
+	vertices.push_back(CEILING_LEVEL);
+	vertices.push_back(0);
+	vertices.push_back(0.34);
+	vertices.push_back(0.16);
+	vertices.push_back(0);
+
+	vertices.push_back(SCR_WIDTH);
+	vertices.push_back(CEILING_LEVEL);
+	vertices.push_back(0);
+	vertices.push_back(0.34);
+	vertices.push_back(0.16);
+	vertices.push_back(0);
+
+	vertices.push_back(SCR_WIDTH);
+	vertices.push_back(FLOOR_LEVEL);
+	vertices.push_back(0);
+	vertices.push_back(0.34);
+	vertices.push_back(0.16);
+	vertices.push_back(0);
+
+	vertices.push_back(RIGHT_WALL_LIMIT);
+	vertices.push_back(FLOOR_LEVEL);
+	vertices.push_back(0);
+	vertices.push_back(0.34);
+	vertices.push_back(0.16);
+	vertices.push_back(0);
+
+	//
+
+	vertices.push_back(0);
+	vertices.push_back(CEILING_LEVEL);
+	vertices.push_back(0);
+	vertices.push_back(0.34);
+	vertices.push_back(0.16);
+	vertices.push_back(0);
+
+	vertices.push_back(LEFT_WALL_LIMIT);
+	vertices.push_back(CEILING_LEVEL);
+	vertices.push_back(0);
+	vertices.push_back(0.34);
+	vertices.push_back(0.16);
+	vertices.push_back(0);
+
+	vertices.push_back(LEFT_WALL_LIMIT);
+	vertices.push_back(FLOOR_LEVEL);
+	vertices.push_back(0);
+	vertices.push_back(0.34);
+	vertices.push_back(0.16);
+	vertices.push_back(0);
+
+	vertices.push_back(0);
+	vertices.push_back(FLOOR_LEVEL);
+	vertices.push_back(0);
+	vertices.push_back(0.34);
+	vertices.push_back(0.16);
+	vertices.push_back(0);
+
+	//
+
+	vertices.push_back(0);
+	vertices.push_back(SCR_HEIGHT);
+	vertices.push_back(0);
+	vertices.push_back(0.34);
+	vertices.push_back(0.16);
+	vertices.push_back(0);
+
+	vertices.push_back(SCR_WIDTH);
+	vertices.push_back(SCR_HEIGHT);
+	vertices.push_back(0);
+	vertices.push_back(0.34);
+	vertices.push_back(0.16);
+	vertices.push_back(0);
+
+	vertices.push_back(SCR_WIDTH);
+	vertices.push_back(CEILING_LEVEL);
+	vertices.push_back(0);
+	vertices.push_back(0.34);
+	vertices.push_back(0.16);
+	vertices.push_back(0);
+
+	vertices.push_back(0);
+	vertices.push_back(CEILING_LEVEL);
+	vertices.push_back(0);
+	vertices.push_back(0.34);
+	vertices.push_back(0.16);
+	vertices.push_back(0);
+
 	// first triangle
 	indices.push_back(0);
 	indices.push_back(1);
@@ -362,6 +519,36 @@ std::tuple<std::vector<double>, std::vector<unsigned int>> GameWorld::generateBa
 	indices.push_back(1);
 	indices.push_back(2);
 	indices.push_back(3);
+
+	// third triangle
+	indices.push_back(4);
+	indices.push_back(5);
+	indices.push_back(7);
+
+	// fourth triangle
+	indices.push_back(5);
+	indices.push_back(6);
+	indices.push_back(7);
+
+	// fith triangle
+	indices.push_back(8);
+	indices.push_back(9);
+	indices.push_back(11);
+
+	// sixth triangle
+	indices.push_back(9);
+	indices.push_back(10);
+	indices.push_back(11);
+
+	// seventh triangle
+	indices.push_back(12);
+	indices.push_back(13);
+	indices.push_back(15);
+
+	// height triangle
+	indices.push_back(13);
+	indices.push_back(14);
+	indices.push_back(15);
 
 	return { vertices, indices };
 }
@@ -375,7 +562,7 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
 	}
 	else if (key == GLFW_KEY_Q && action == GLFW_PRESS)
 	{
-		inputsManager->addIntention(InputsManager::Intention::CREATE_PARTICLE_ONE);
+		inputsManager->addIntention(InputsManager::Intention::CREATE_BLOB);
 	}
 	else if (key == GLFW_KEY_W && action == GLFW_PRESS)
 	{

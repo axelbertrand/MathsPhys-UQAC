@@ -12,7 +12,7 @@ namespace physicslib
 		Vector3 d = particle->getPosition() - m_otherParticle->getPosition();
 		if (d.getNorm() >= m_restingLength)
 		{
-			particle->addForce(d.getNormalizedVector() * (m_elasticity) * (d.getNorm() - m_restingLength));
+			particle->addForce(d.getNormalizedVector() * (-m_elasticity) * (d.getNorm() - m_restingLength));
 		}
 	}
 }

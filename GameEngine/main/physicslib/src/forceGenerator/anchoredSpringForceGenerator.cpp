@@ -10,6 +10,6 @@ namespace physicslib
 	void AnchoredSpringForceGenerator::updateForce(std::shared_ptr<Particle> particle, const double duration) const
 	{
 		Vector3 d = particle->getPosition() - m_anchorPosition;
-		particle->addForce(d.getNormalizedVector() * (m_elasticity) * (d.getNorm() - m_restingLength));
+		particle->addForce(d.getNormalizedVector() * (-m_elasticity) * (d.getNorm() - m_restingLength));
 	}
 }
