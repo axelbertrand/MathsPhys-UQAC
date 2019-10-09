@@ -31,21 +31,19 @@ namespace physicslib
 	{
 		double x = getPosition().getX();
 		double y = getPosition().getY();
-		if (x - 5 >= xMax || x + 5 <= 0 || y - 5 >= yMax || y + 5 <= 0)
-		{
-			return false;
-		}
-		return true;
+
+		return (x - 5 < xMax && x + 5 > 0 && y - 5 < yMax && y + 5 > 0);
 	}
 
 	//indicates whether or not there is a contact between these two particles
-	bool Particle::isInContactWith(const Particle particle) const
+	bool Particle::isInContactWith(const Particle& particle) const
 	{
-		if ((m_position - particle.getPosition()).getNorm() <= 2 * PARTICLE_RADIUS)
-		{
-			return true;
-		}
-		return false;
+		return (getDistance(particle) <= 2. * PARTICLE_RADIUS);
+	}
+
+	double Particle::getDistance(const Particle& particle) const
+	{
+		return (m_position - particle.getPosition()).getNorm();
 	}
 
 	// Updates position, speed, acceleration using Newton laws
