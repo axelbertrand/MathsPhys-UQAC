@@ -122,7 +122,7 @@ void GameWorld::updatePhysics(const double frametime)
 				physicslib::Vector3 contactNormal = ((*particle1)->getPosition() - (*particle2)->getPosition()).getNormalizedVector();
 				double vs = contactNormal * ((*particle1)->getSpeed() - (*particle2)->getSpeed());
 				double penetration = 2 * physicslib::Particle::PARTICLE_RADIUS - ((*particle1)->getPosition() - (*particle2)->getPosition()).getNorm();
-				physicslib::ParticleContact particleContact = physicslib::ParticleContact(particle1->get(), particle2->get(), 0.9, vs, penetration, contactNormal);
+				physicslib::ParticleContact particleContact = physicslib::ParticleContact(particle1->get(), particle2->get(), 0.7, vs, penetration, contactNormal);
 				m_contactRegister.add(particleContact);
 			}
 			particle2++;
@@ -133,7 +133,7 @@ void GameWorld::updatePhysics(const double frametime)
 			double vs = contactNormal * (*particle1)->getSpeed();
 			double penetration = 2 * physicslib::Particle::PARTICLE_RADIUS - ((*particle1)->getPosition() - physicslib::Vector3((*particle1)->getPosition().getX(), FLOOR_LEVEL, 0)).getNorm();
 			(*particle1)->setPosition(physicslib::Vector3((*particle1)->getPosition().getX(), FLOOR_LEVEL, 0));
-			physicslib::ParticleContact particleContact = physicslib::ParticleContact(particle1->get(), nullptr, 0.5, vs, penetration, contactNormal);
+			physicslib::ParticleContact particleContact = physicslib::ParticleContact(particle1->get(), nullptr, 1.3, vs, penetration, contactNormal);
 			m_contactRegister.add(particleContact);
 		}
 		if ((*particle1)->getPosition().getY() > CEILING_LEVEL - physicslib::Particle::PARTICLE_RADIUS)
@@ -142,7 +142,7 @@ void GameWorld::updatePhysics(const double frametime)
 			double vs = contactNormal * (*particle1)->getSpeed();
 			double penetration = 2 * physicslib::Particle::PARTICLE_RADIUS - ((*particle1)->getPosition() - physicslib::Vector3((*particle1)->getPosition().getX(), CEILING_LEVEL, 0)).getNorm();
 			(*particle1)->setPosition(physicslib::Vector3((*particle1)->getPosition().getX(), CEILING_LEVEL, 0));
-			physicslib::ParticleContact particleContact = physicslib::ParticleContact(particle1->get(), nullptr, 0.9, vs, penetration, contactNormal);
+			physicslib::ParticleContact particleContact = physicslib::ParticleContact(particle1->get(), nullptr, 1.0, vs, penetration, contactNormal);
 			m_contactRegister.add(particleContact);
 		}
 		if ((*particle1)->getPosition().getX() < LEFT_WALL_LIMIT + physicslib::Particle::PARTICLE_RADIUS)
@@ -151,7 +151,7 @@ void GameWorld::updatePhysics(const double frametime)
 			double vs = contactNormal * (*particle1)->getSpeed();
 			double penetration = 2 * physicslib::Particle::PARTICLE_RADIUS - ((*particle1)->getPosition() - physicslib::Vector3(LEFT_WALL_LIMIT, (*particle1)->getPosition().getY(), 0)).getNorm();
 			(*particle1)->setPosition(physicslib::Vector3(LEFT_WALL_LIMIT, (*particle1)->getPosition().getY(), 0));
-			physicslib::ParticleContact particleContact = physicslib::ParticleContact(particle1->get(), nullptr, 0.9, vs, penetration, contactNormal);
+			physicslib::ParticleContact particleContact = physicslib::ParticleContact(particle1->get(), nullptr, 1.3, vs, penetration, contactNormal);
 			m_contactRegister.add(particleContact);
 		}
 		if ((*particle1)->getPosition().getX() > RIGHT_WALL_LIMIT - physicslib::Particle::PARTICLE_RADIUS)
@@ -160,7 +160,7 @@ void GameWorld::updatePhysics(const double frametime)
 			double vs = contactNormal * (*particle1)->getSpeed();
 			double penetration = 2 * physicslib::Particle::PARTICLE_RADIUS - ((*particle1)->getPosition() - physicslib::Vector3(RIGHT_WALL_LIMIT, (*particle1)->getPosition().getY(), 0)).getNorm();
 			(*particle1)->setPosition(physicslib::Vector3(RIGHT_WALL_LIMIT, (*particle1)->getPosition().getY(), 0));
-			physicslib::ParticleContact particleContact = physicslib::ParticleContact(particle1->get(), nullptr, 0.9, vs, penetration, contactNormal);
+			physicslib::ParticleContact particleContact = physicslib::ParticleContact(particle1->get(), nullptr, 1.3, vs, penetration, contactNormal);
 			m_contactRegister.add(particleContact);
 		}
 		particle1++;
