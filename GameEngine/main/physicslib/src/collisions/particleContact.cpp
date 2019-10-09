@@ -12,14 +12,12 @@ namespace physicslib
 
 	void ParticleContact::resolve(double frametime)
 	{
-		
+
 		//calculateVariables();
 		if (m_vs < 0)
 		{
-			return;
+			resolveVelocity(frametime);
 		}
-
-		resolveVelocity(frametime);
 		resolveInterpenetration();
 	}
 
@@ -34,7 +32,7 @@ namespace physicslib
 	}*/
 
 	void ParticleContact::resolveInterpenetration()
-	{	
+	{
 		if (m_particles[1] == nullptr)
 		{
 			if (m_particles[0]->getInverseMass() != 0)
@@ -61,7 +59,7 @@ namespace physicslib
 			m_particles[1]->setPosition(move2);
 		}
 	}
-		
+
 
 	void ParticleContact::resolveVelocity(double frametime)
 	{

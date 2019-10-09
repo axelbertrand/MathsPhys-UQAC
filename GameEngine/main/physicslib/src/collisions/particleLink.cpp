@@ -2,7 +2,7 @@
 
 namespace physicslib
 {
-	ParticleLink::ParticleLink(Particle particle1, Particle particle2) :
+	ParticleLink::ParticleLink(Particle* particle1, Particle* particle2) :
 		ParticleContactGenerator()
 	{
 		m_particles[0] = particle1;
@@ -15,6 +15,6 @@ namespace physicslib
 
 	double ParticleLink::getCurrentLength()
 	{
-		return m_particles[0].getDistance(m_particles[1]);
+		return m_particles[0]->getDistance(*m_particles[1]);
 	}
 }
