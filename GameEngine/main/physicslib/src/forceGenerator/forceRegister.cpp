@@ -4,8 +4,9 @@
 
 namespace physicslib
 {
-	ForceRegister::ForceRecord::ForceRecord(std::shared_ptr<Particle> particle, std::shared_ptr<ParticleForceGenerator> forceGenerator)
-		: particle(particle), forceGenerator(forceGenerator)
+	ForceRegister::ForceRecord::ForceRecord(const std::shared_ptr<Particle> particle,
+		const std::shared_ptr<const ParticleForceGenerator> forceGenerator): 
+		particle(particle), forceGenerator(forceGenerator)
 	{
 	}
 
