@@ -5,8 +5,6 @@
 #include <tuple>
 #include <cmath>
 
-#include "collisions/particleCable.hpp"
-
 #include "../include/shaderSources.hpp"
 
 void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
@@ -82,7 +80,7 @@ void GameWorld::processIntention(const InputsManager::Intention intention)
 	}
 	else if (intention == InputsManager::CREATE_BLOB)
 	{
-		std::shared_ptr<Blob> blob = createBlob(10);
+		std::shared_ptr<Blob> blob = createBlob(20);
 		if (m_mainBlob == nullptr)
 		{
 			m_mainBlob = blob;
@@ -103,28 +101,28 @@ void GameWorld::processIntention(const InputsManager::Intention intention)
 	else if (intention == InputsManager::MOVE_BLOB_BOTTOM && m_mainBlob != nullptr)
 	{
 		std::shared_ptr<physicslib::GravityForceGenerator> moveBottomGenerator = std::make_shared<physicslib::GravityForceGenerator>
-			(physicslib::Vector3(0, -100, 0));
+			(physicslib::Vector3(0, -300, 0));
 		physicslib::ForceRegister::ForceRecord record(m_mainBlob->getCore(), moveBottomGenerator);
 		m_forceRegister.add(record);
 	}
 	else if (intention == InputsManager::MOVE_BLOB_TOP && m_mainBlob != nullptr)
 	{
 		std::shared_ptr<physicslib::GravityForceGenerator> moveTopGenerator = std::make_shared<physicslib::GravityForceGenerator>
-			(physicslib::Vector3(0, 100, 0));
+			(physicslib::Vector3(0, 1000, 0));
 		physicslib::ForceRegister::ForceRecord record(m_mainBlob->getCore(), moveTopGenerator);
 		m_forceRegister.add(record);
 	}
 	else if (intention == InputsManager::MOVE_BLOB_LEFT && m_mainBlob != nullptr)
 	{
 		std::shared_ptr<physicslib::GravityForceGenerator> moveLeftGenerator = std::make_shared<physicslib::GravityForceGenerator>
-			(physicslib::Vector3(-100, 0, 0));
+			(physicslib::Vector3(-500, 0, 0));
 		physicslib::ForceRegister::ForceRecord record(m_mainBlob->getCore(), moveLeftGenerator);
 		m_forceRegister.add(record);
 	}
 	else if (intention == InputsManager::MOVE_BLOB_RIGHT && m_mainBlob != nullptr)
 	{
 		std::shared_ptr<physicslib::GravityForceGenerator> moveLeftGenerator = std::make_shared<physicslib::GravityForceGenerator>
-			(physicslib::Vector3(100, 0, 0));
+			(physicslib::Vector3(500, 0, 0));
 		physicslib::ForceRegister::ForceRecord record(m_mainBlob->getCore(), moveLeftGenerator);
 		m_forceRegister.add(record);
 	}
@@ -140,12 +138,12 @@ std::shared_ptr<Blob> GameWorld::createBlob(const unsigned int blobCount)
 	for (unsigned int count = 0; count < blobCount - 1; ++count)
 	{
 		auto particle = std::make_shared<physicslib::Particle>
-			(1, physicslib::Vector3(450+count, 400, 0), physicslib::Vector3(0, 0, 0), physicslib::Vector3());
+			(1, physicslib::Vector3(450+count, 400+count, 0), physicslib::Vector3(0, 0, 0), physicslib::Vector3());
 		particles.push_back(particle);
 		m_particles.push_back(particle);
 	}
 
-	std::shared_ptr<Blob> blob = std::make_shared<Blob>(coreParticle, particles, 10, 15);
+	std::shared_ptr<Blob> blob = std::make_shared<Blob>(coreParticle, particles, 40, 75);
 	m_blobs.push_back(blob);
 	return blob;
 }
@@ -176,7 +174,6 @@ void GameWorld::updatePhysics(const double frametime)
 				physicslib::ParticleContact particleContact = physicslib::ParticleContact(particle1->get(), particle2->get(), 0.7, vs, penetration, contactNormal);
 				m_contactRegister.add(particleContact);
 			}
-
 			particle2++;
 		}
 		if ((*particle1)->getPosition().getY() < FLOOR_LEVEL + physicslib::Particle::PARTICLE_RADIUS)
