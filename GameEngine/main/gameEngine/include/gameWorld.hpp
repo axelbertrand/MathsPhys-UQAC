@@ -54,6 +54,7 @@ private:
 	void processInputs(const std::vector<InputsManager::Intention>& pendingIntentions);
 	void processIntention(InputsManager::Intention intention);
 	std::shared_ptr<Blob> createBlob(const unsigned int blobCount);
+	void separateMainBlob();
 	void updatePhysics(const double frametime);
 	void generateAllForces();
 	void generateGravityAndDragForces();

@@ -128,6 +128,32 @@ void GameWorld::processIntention(const InputsManager::Intention intention)
 		physicslib::ForceRegister::ForceRecord record(m_mainBlob->getCore(), moveLeftGenerator);
 		m_forceRegister.add(record);
 	}
+	else if (intention == InputsManager::CUT_MAIN_BLOB && m_mainBlob != nullptr)
+	{
+		separateMainBlob();
+	}
+	else if (intention == InputsManager::FUSION_ALL_BLOB && m_blobs.size() > 1)
+	{
+		std::shared_ptr<physicslib::Particle > coreParticle = m_mainBlob->getCore();
+		std::vector<std::shared_ptr<physicslib::Particle>> particles = m_mainBlob->getParticles();
+		double linkElasticity = m_mainBlob->getLinksElasticity();
+		double linkLength = m_mainBlob->getLinksRestingLength();
+
+		std::for_each(m_blobs.begin(), m_blobs.end(),
+			[this, &particles](const std::shared_ptr<Blob> blob)
+			{
+				if (blob != m_mainBlob)
+				{
+					particles.push_back(blob->getCore());
+					std::vector<std::shared_ptr<physicslib::Particle>> newParticles = blob->getParticles();
+					particles.insert(particles.end(), newParticles.begin(), newParticles.end());
+				}
+			});
+		m_blobs.clear();
+
+		m_mainBlob = std::make_shared<Blob>(coreParticle, particles, linkElasticity, linkLength);
+		m_blobs.push_back(m_mainBlob);
+	}
 }
 
 std::shared_ptr<Blob> GameWorld::createBlob(const unsigned int blobCount)
@@ -148,6 +174,55 @@ std::shared_ptr<Blob> GameWorld::createBlob(const unsigned int blobCount)
 	std::shared_ptr<Blob> blob = std::make_shared<Blob>(coreParticle, particles, 40, 75);
 	m_blobs.push_back(blob);
 	return blob;
+}
+
+void GameWorld::separateMainBlob()
+{
+	// we cut the main blob in 2 blob
+	std::shared_ptr<physicslib::Particle > coreParticle = m_mainBlob->getCore();
+	std::vector<std::shared_ptr<physicslib::Particle>> particles = m_mainBlob->getParticles();
+	std::shared_ptr<physicslib::Particle> secondCoreParticle = particles.back();
+	particles.pop_back();
+	std::vector<std::shared_ptr<physicslib::Particle>> secondParticles;
+
+	std::vector<std::shared_ptr<physicslib::Particle>>::iterator particleIt = particles.begin();
+	bool transfer = false;
+	while (particleIt != particles.end())
+	{
+		if (transfer)
+		{
+			std::shared_ptr<physicslib::Particle> transferedParticle = *particleIt;
+			particleIt = particles.erase(particleIt);
+			secondParticles.push_back(transferedParticle);
+
+			transferedParticle->setSpeed(physicslib::Vector3(-400, -400, 0)); // impulsion to see the separation of the blob
+		}
+		else
+		{
+			(*particleIt)->setSpeed(physicslib::Vector3(400, 400, 0)); // impulsion to see the separation of the blob
+			++particleIt;
+		}
+		transfer = !transfer;
+	}
+
+	// deleting the old blob from m_blobs
+	for (auto i = m_blobs.begin(); i != m_blobs.end(); ++i)
+	{
+		if ((*i) == m_mainBlob)
+		{
+			m_blobs.erase(i);
+			break;
+		}
+	}
+
+	// adding the new blobs in m_blobs
+	std::shared_ptr<Blob> firstNewBlob = std::make_shared<Blob>(coreParticle, particles,
+		m_mainBlob->getLinksElasticity(), m_mainBlob->getLinksRestingLength());
+	std::shared_ptr<Blob> secondNewBlob = std::make_shared<Blob>(secondCoreParticle, secondParticles,
+		m_mainBlob->getLinksElasticity(), m_mainBlob->getLinksRestingLength());
+	m_mainBlob = firstNewBlob;
+	m_blobs.push_back(firstNewBlob);
+	m_blobs.push_back(secondNewBlob);
 }
 
 void GameWorld::updatePhysics(const double frametime)
@@ -632,6 +707,14 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
 	else if (key == GLFW_KEY_E && action == GLFW_PRESS)
 	{
 		inputsManager->addIntention(InputsManager::Intention::CREATE_PARTICLE_THREE);
+	}
+	else if (key == GLFW_KEY_A && action == GLFW_PRESS)
+	{
+		inputsManager->addIntention(InputsManager::Intention::CUT_MAIN_BLOB);
+	}
+	else if (key == GLFW_KEY_S && action == GLFW_PRESS)
+	{
+		inputsManager->addIntention(InputsManager::Intention::FUSION_ALL_BLOB);
 	}
 
 }
