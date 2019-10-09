@@ -1,7 +1,6 @@
 #pragma once
-#include <vector3.hpp>
-#include <string>
-#include "particle.hpp"
+
+#include "contactRegister.hpp"
 
 namespace physicslib
 {
@@ -12,7 +11,6 @@ namespace physicslib
 		ParticleContactGenerator() = default;
 		virtual ~ParticleContactGenerator() = default;
 
-		virtual void ajouterContact() = 0;
+		virtual void addContact(ContactRegister& contactRegister) = 0;
 	};
-
 }

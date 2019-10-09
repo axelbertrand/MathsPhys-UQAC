@@ -5,6 +5,8 @@
 #include <tuple>
 #include <cmath>
 
+#include "collisions/particleCable.hpp"
+
 #include "../include/shaderSources.hpp"
 
 void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
@@ -174,6 +176,7 @@ void GameWorld::updatePhysics(const double frametime)
 				physicslib::ParticleContact particleContact = physicslib::ParticleContact(particle1->get(), particle2->get(), 0.7, vs, penetration, contactNormal);
 				m_contactRegister.add(particleContact);
 			}
+
 			particle2++;
 		}
 		if ((*particle1)->getPosition().getY() < FLOOR_LEVEL + physicslib::Particle::PARTICLE_RADIUS)
