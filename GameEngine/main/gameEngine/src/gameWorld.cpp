@@ -5,6 +5,8 @@
 #include <tuple>
 #include <cmath>
 
+#include "collisions/particleCable.hpp"
+
 #include "../include/shaderSources.hpp"
 
 void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
@@ -89,13 +91,13 @@ void GameWorld::processIntention(const InputsManager::Intention intention)
 	else if (intention == InputsManager::CREATE_PARTICLE_TWO)
 	{
 		std::shared_ptr<physicslib::Particle> particle = std::make_shared<physicslib::Particle>
-			(1, physicslib::Vector3(30, 400, 0), physicslib::Vector3(100, 0, 0), physicslib::Vector3());
+			(1, physicslib::Vector3(30, 30, 0), physicslib::Vector3(100, 50, 0), physicslib::Vector3());
 		m_particles.push_back(particle);
 	}
 	else if (intention == InputsManager::CREATE_PARTICLE_THREE)
 	{
 		std::shared_ptr<physicslib::Particle> particle = std::make_shared<physicslib::Particle>
-			(1, physicslib::Vector3(30, 30, 0), physicslib::Vector3(100, 100, 0), physicslib::Vector3());
+			(1, physicslib::Vector3(300, 30, 0), physicslib::Vector3(-100, 50, 0), physicslib::Vector3());
 		m_particles.push_back(particle);
 	}
 	else if (intention == InputsManager::MOVE_BLOB_BOTTOM && m_mainBlob != nullptr)
@@ -138,12 +140,12 @@ std::shared_ptr<Blob> GameWorld::createBlob(const unsigned int blobCount)
 	for (unsigned int count = 0; count < blobCount - 1; ++count)
 	{
 		auto particle = std::make_shared<physicslib::Particle>
-			(1, physicslib::Vector3(450+count, 400+count, 0), physicslib::Vector3(0, 0, 0), physicslib::Vector3());
+			(1, physicslib::Vector3(100+20*count, 100+20*count, 0), physicslib::Vector3(0, 0, 0), physicslib::Vector3());
 		particles.push_back(particle);
 		m_particles.push_back(particle);
 	}
 
-	std::shared_ptr<Blob> blob = std::make_shared<Blob>(coreParticle, particles, 40, 75);
+	std::shared_ptr<Blob> blob = std::make_shared<Blob>(coreParticle, particles, 4, 50);
 	m_blobs.push_back(blob);
 	return blob;
 }
@@ -174,6 +176,7 @@ void GameWorld::updatePhysics(const double frametime)
 				physicslib::ParticleContact particleContact = physicslib::ParticleContact(particle1->get(), particle2->get(), 0.7, vs, penetration, contactNormal);
 				m_contactRegister.add(particleContact);
 			}
+
 			particle2++;
 		}
 		if ((*particle1)->getPosition().getY() < FLOOR_LEVEL + physicslib::Particle::PARTICLE_RADIUS)
@@ -249,6 +252,13 @@ void GameWorld::generateBlobsForces()
 					[this](const auto& record)
 					{
 						m_forceRegister.add(record);
+					});
+
+				auto contactGenerators = blob->getParticleContacts();
+				std::for_each(contactGenerators.begin(), contactGenerators.end(),
+					[this](auto& contactGenerator)
+					{
+						contactGenerator.addContact(m_contactRegister);
 					});
 			});
 	}
