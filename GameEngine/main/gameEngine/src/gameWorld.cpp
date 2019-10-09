@@ -138,12 +138,12 @@ std::shared_ptr<Blob> GameWorld::createBlob(const unsigned int blobCount)
 	for (unsigned int count = 0; count < blobCount - 1; ++count)
 	{
 		auto particle = std::make_shared<physicslib::Particle>
-			(1, physicslib::Vector3(450+5*count, 400, 0), physicslib::Vector3(0, 0, 0), physicslib::Vector3());
+			(1, physicslib::Vector3(450+count, 400, 0), physicslib::Vector3(0, 0, 0), physicslib::Vector3());
 		particles.push_back(particle);
 		m_particles.push_back(particle);
 	}
 
-	std::shared_ptr<Blob> blob = std::make_shared<Blob>(coreParticle, particles, 0.2, 0);
+	std::shared_ptr<Blob> blob = std::make_shared<Blob>(coreParticle, particles, 10, 15);
 	m_blobs.push_back(blob);
 	return blob;
 }
@@ -232,7 +232,7 @@ void GameWorld::generateGravityAndDragForces()
 	std::for_each(m_particles.begin(), m_particles.end(),
 		[this](const auto& particle)
 		{
-			//m_forceRegister.add(physicslib::ForceRegister::ForceRecord(particle, gravityGenerator));
+			m_forceRegister.add(physicslib::ForceRegister::ForceRecord(particle, gravityGenerator));
 			m_forceRegister.add(physicslib::ForceRegister::ForceRecord(particle, dragGenerator));
 		});
 }
