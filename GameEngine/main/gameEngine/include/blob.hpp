@@ -13,7 +13,7 @@ public:
 	Blob(std::shared_ptr<physicslib::Particle> coreParticle, std::vector<std::shared_ptr<physicslib::Particle>> particles,
 		double linksElasticity, double linksRestingLength);
 
-	std::shared_ptr<physicslib::Particle> getCore() const;
+	std::shared_ptr<physicslib::Particle> getCore();
 	std::vector<physicslib::ForceRegister::ForceRecord> getForceRecords() const;
 
 private:

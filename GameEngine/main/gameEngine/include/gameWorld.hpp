@@ -45,12 +45,14 @@ private:
 	GLFWwindow* const m_mainWindow;
 	InputsManager m_inputsManager;
 	std::vector<std::shared_ptr<physicslib::Particle>> m_particles;
-	std::vector<std::unique_ptr<Blob>> m_blobs;
+	std::vector<std::shared_ptr<Blob>> m_blobs;
+	std::shared_ptr<Blob> m_mainBlob = nullptr;
 
 	void updateGame(const std::vector<InputsManager::Intention> pendingIntentions, const double frametime);
 	std::vector<InputsManager::Intention> getPendingIntentions();
 	void processInputs(const std::vector<InputsManager::Intention>& pendingIntentions);
 	void processIntention(InputsManager::Intention intention);
+	std::shared_ptr<Blob> createBlob(const unsigned int blobCount);
 	void updatePhysics(const double frametime);
 	void generateAllForces();
 	void generateGravityAndDragForces();

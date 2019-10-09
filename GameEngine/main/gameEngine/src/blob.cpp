@@ -19,7 +19,7 @@ Blob::Blob(std::shared_ptr<physicslib::Particle> coreParticle, std::vector<std::
 		});
 }
 
-std::shared_ptr<physicslib::Particle> Blob::getCore() const
+std::shared_ptr<physicslib::Particle> Blob::getCore()
 {
 	return m_coreParticle;
 }
