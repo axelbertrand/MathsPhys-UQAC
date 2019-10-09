@@ -26,7 +26,6 @@ GameWorld::GameWorld(): m_openGlWrapper(SCR_WIDTH, SCR_HEIGHT, WINDOW_TITLE), m_
 
 void GameWorld::run()
 {
-	
 	double frametime = 0.033333;//first frame considered at 30fps
 	// game loops
 	while (!m_openGlWrapper.windowShouldClose(m_mainWindow))
@@ -79,11 +78,22 @@ void GameWorld::processIntention(const InputsManager::Intention intention)
 	{
 		m_openGlWrapper.closeMainWindow();
 	}
-	else if (intention == InputsManager::CREATE_PARTICLE_ONE)
+	else if (intention == InputsManager::CREATE_BLOB)
 	{
-		std::shared_ptr<physicslib::Particle> particle = std::make_shared<physicslib::Particle>
-			(1, physicslib::Vector3(10, 10, 0), physicslib::Vector3(100, 50, 0), physicslib::Vector3());
+		auto coreParticle = std::make_shared<physicslib::Particle>
+			(1, physicslib::Vector3(400, 400, 0), physicslib::Vector3(0, 0, 0), physicslib::Vector3());
+		std::vector<std::shared_ptr<physicslib::Particle>> particles;
+		m_particles.push_back(coreParticle);
+		auto particle = std::make_shared<physicslib::Particle>
+			(1, physicslib::Vector3(450, 400, 0), physicslib::Vector3(0, 0, 0), physicslib::Vector3());
+		particles.push_back(particle);
 		m_particles.push_back(particle);
+		particle = std::make_shared<physicslib::Particle>
+			(1, physicslib::Vector3(425, 350, 0), physicslib::Vector3(0, 0, 0), physicslib::Vector3());
+		particles.push_back(particle);
+		m_particles.push_back(particle);
+
+		m_blobs.push_back(std::make_unique<Blob>(coreParticle, particles, 0.2, 0));
 	}
 	else if (intention == InputsManager::CREATE_PARTICLE_TWO)
 	{
@@ -142,6 +152,7 @@ void GameWorld::updatePhysics(const double frametime)
 void GameWorld::generateAllForces()
 {
 	generateGravityAndDragForces();
+	generateBlobsForces();
 }
 
 void GameWorld::generateGravityAndDragForces()
@@ -149,9 +160,26 @@ void GameWorld::generateGravityAndDragForces()
 	std::for_each(m_particles.begin(), m_particles.end(),
 		[this](const auto& particle)
 		{
-			m_forceRegister.add(physicslib::ForceRegister::ForceRecord(particle, gravityGenerator));
+			//m_forceRegister.add(physicslib::ForceRegister::ForceRecord(particle, gravityGenerator));
 			m_forceRegister.add(physicslib::ForceRegister::ForceRecord(particle, dragGenerator));
 		});
+}
+
+void GameWorld::generateBlobsForces()
+{
+	if (!m_blobs.empty())
+	{
+		std::for_each(m_blobs.begin(), m_blobs.end(),
+			[this](const auto& blob)
+			{
+				auto records = blob->getForceRecords();
+				std::for_each(records.begin(), records.end(),
+					[this](const auto& record)
+					{
+						m_forceRegister.add(record);
+					});
+			});
+	}
 }
 
 void GameWorld::updateParticlesPosition(const double frametime)
@@ -342,7 +370,7 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
 	}
 	else if (key == GLFW_KEY_Q && action == GLFW_PRESS)
 	{
-		inputsManager->addIntention(InputsManager::Intention::CREATE_PARTICLE_ONE);
+		inputsManager->addIntention(InputsManager::Intention::CREATE_BLOB);
 	}
 	else if (key == GLFW_KEY_W && action == GLFW_PRESS)
 	{
