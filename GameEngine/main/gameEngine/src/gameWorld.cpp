@@ -161,65 +161,11 @@ void GameWorld::updatePhysics(const double frametime)
 	// update the position of the particles
 	updateParticlesPosition(frametime);
 
-	//look for collisions
-	auto particle1 = std::begin(m_particles);
-	while (particle1 != std::end(m_particles))
-	{
-		auto particle2 = std::begin(m_particles);
-		while (particle2 != particle1)
-		{
-			if ((*particle1)->isInContactWith(*(particle2->get())))
-			{//collision with another particle
-				physicslib::Vector3 contactNormal = ((*particle1)->getPosition() - (*particle2)->getPosition()).getNormalizedVector();
-				double vs = contactNormal * ((*particle1)->getSpeed() - (*particle2)->getSpeed());
-				double penetration = 2 * physicslib::Particle::PARTICLE_RADIUS - ((*particle1)->getPosition() - (*particle2)->getPosition()).getNorm();
-				physicslib::ParticleContact particleContact = physicslib::ParticleContact(particle1->get(), particle2->get(), 0.7, vs, penetration, contactNormal);
-				m_contactRegister.add(particleContact);
-			}
-			particle2++;
-		}
-		if ((*particle1)->getPosition().getY() < FLOOR_LEVEL + physicslib::Particle::PARTICLE_RADIUS 
-				&& (*particle1)->getPosition().getX() < WATER_LIMIT)
-		{ //collision on the ground
-			physicslib::Vector3 contactNormal(0, 1, 0);
-			double vs = contactNormal * (*particle1)->getSpeed();
-			double penetration = 2 * physicslib::Particle::PARTICLE_RADIUS - ((*particle1)->getPosition() - physicslib::Vector3((*particle1)->getPosition().getX(), FLOOR_LEVEL, 0)).getNorm();
-			(*particle1)->setPosition(physicslib::Vector3((*particle1)->getPosition().getX(), FLOOR_LEVEL, 0));
-			physicslib::ParticleContact particleContact = physicslib::ParticleContact(particle1->get(), nullptr, 1.3, vs, penetration, contactNormal);
-			m_contactRegister.add(particleContact);
-		}
-		if ((*particle1)->getPosition().getY() > CEILING_LEVEL - physicslib::Particle::PARTICLE_RADIUS)
-		{//collision on the ceiling
-			physicslib::Vector3 contactNormal(0, -1, 0);
-			double vs = contactNormal * (*particle1)->getSpeed();
-			double penetration = 2 * physicslib::Particle::PARTICLE_RADIUS - ((*particle1)->getPosition() - physicslib::Vector3((*particle1)->getPosition().getX(), CEILING_LEVEL, 0)).getNorm();
-			(*particle1)->setPosition(physicslib::Vector3((*particle1)->getPosition().getX(), CEILING_LEVEL, 0));
-			physicslib::ParticleContact particleContact = physicslib::ParticleContact(particle1->get(), nullptr, 1.0, vs, penetration, contactNormal);
-			m_contactRegister.add(particleContact);
-		}
-		if ((*particle1)->getPosition().getX() < LEFT_WALL_LIMIT + physicslib::Particle::PARTICLE_RADIUS)
-		{//collision on the left
-			physicslib::Vector3 contactNormal(1, 0, 0);
-			double vs = contactNormal * (*particle1)->getSpeed();
-			double penetration = 2 * physicslib::Particle::PARTICLE_RADIUS - ((*particle1)->getPosition() - physicslib::Vector3(LEFT_WALL_LIMIT, (*particle1)->getPosition().getY(), 0)).getNorm();
-			(*particle1)->setPosition(physicslib::Vector3(LEFT_WALL_LIMIT, (*particle1)->getPosition().getY(), 0));
-			physicslib::ParticleContact particleContact = physicslib::ParticleContact(particle1->get(), nullptr, 1.3, vs, penetration, contactNormal);
-			m_contactRegister.add(particleContact);
-		}
-		if ((*particle1)->getPosition().getX() > RIGHT_WALL_LIMIT - physicslib::Particle::PARTICLE_RADIUS)
-		{//collision on the right
-			physicslib::Vector3 contactNormal(-1, 0, 0);
-			double vs = contactNormal * (*particle1)->getSpeed();
-			double penetration = 2 * physicslib::Particle::PARTICLE_RADIUS - ((*particle1)->getPosition() - physicslib::Vector3(RIGHT_WALL_LIMIT, (*particle1)->getPosition().getY(), 0)).getNorm();
-			(*particle1)->setPosition(physicslib::Vector3(RIGHT_WALL_LIMIT, (*particle1)->getPosition().getY(), 0));
-			physicslib::ParticleContact particleContact = physicslib::ParticleContact(particle1->get(), nullptr, 1.3, vs, penetration, contactNormal);
-			m_contactRegister.add(particleContact);
-		}
-		particle1++;
-	}
+	// look for collisions and resolve them
+	detectCollision();
 	m_contactRegister.resolveContacts(frametime);
 
-	// cleaning registers
+	// clean registers
 	m_contactRegister.clear();
 	m_forceRegister.clear();
 }
@@ -281,6 +227,65 @@ void GameWorld::generateBuoyancyForces()
 				m_forceRegister.add(dragRecord);
 			}
 		});
+}
+
+void GameWorld::detectCollision()
+{
+	auto particle1 = std::begin(m_particles);
+	while (particle1 != std::end(m_particles))
+	{
+		auto particle2 = std::begin(m_particles);
+		while (particle2 != particle1)
+		{
+			if ((*particle1)->isInContactWith(*(particle2->get())))
+			{ //collision with another particle
+				physicslib::Vector3 contactNormal = ((*particle1)->getPosition() - (*particle2)->getPosition()).getNormalizedVector();
+				double vs = contactNormal * ((*particle1)->getSpeed() - (*particle2)->getSpeed());
+				double penetration = 2 * physicslib::Particle::PARTICLE_RADIUS - ((*particle1)->getPosition() - (*particle2)->getPosition()).getNorm();
+				physicslib::ParticleContact particleContact = physicslib::ParticleContact(particle1->get(), particle2->get(), 0.7, vs, penetration, contactNormal);
+				m_contactRegister.add(particleContact);
+			}
+			particle2++;
+		}
+		if ((*particle1)->getPosition().getY() < FLOOR_LEVEL + physicslib::Particle::PARTICLE_RADIUS
+			&& (*particle1)->getPosition().getX() < WATER_LIMIT)
+		{  //collision on the ground
+			physicslib::Vector3 contactNormal(0, 1, 0);
+			double vs = contactNormal * (*particle1)->getSpeed();
+			double penetration = 2 * physicslib::Particle::PARTICLE_RADIUS - ((*particle1)->getPosition() - physicslib::Vector3((*particle1)->getPosition().getX(), FLOOR_LEVEL, 0)).getNorm();
+			(*particle1)->setPosition(physicslib::Vector3((*particle1)->getPosition().getX(), FLOOR_LEVEL, 0));
+			physicslib::ParticleContact particleContact = physicslib::ParticleContact(particle1->get(), nullptr, 1.3, vs, penetration, contactNormal);
+			m_contactRegister.add(particleContact);
+		}
+		if ((*particle1)->getPosition().getY() > CEILING_LEVEL - physicslib::Particle::PARTICLE_RADIUS)
+		{//collision on the ceiling
+			physicslib::Vector3 contactNormal(0, -1, 0);
+			double vs = contactNormal * (*particle1)->getSpeed();
+			double penetration = 2 * physicslib::Particle::PARTICLE_RADIUS - ((*particle1)->getPosition() - physicslib::Vector3((*particle1)->getPosition().getX(), CEILING_LEVEL, 0)).getNorm();
+			(*particle1)->setPosition(physicslib::Vector3((*particle1)->getPosition().getX(), CEILING_LEVEL, 0));
+			physicslib::ParticleContact particleContact = physicslib::ParticleContact(particle1->get(), nullptr, 1.0, vs, penetration, contactNormal);
+			m_contactRegister.add(particleContact);
+		}
+		if ((*particle1)->getPosition().getX() < LEFT_WALL_LIMIT + physicslib::Particle::PARTICLE_RADIUS)
+		{//collision on the left
+			physicslib::Vector3 contactNormal(1, 0, 0);
+			double vs = contactNormal * (*particle1)->getSpeed();
+			double penetration = 2 * physicslib::Particle::PARTICLE_RADIUS - ((*particle1)->getPosition() - physicslib::Vector3(LEFT_WALL_LIMIT, (*particle1)->getPosition().getY(), 0)).getNorm();
+			(*particle1)->setPosition(physicslib::Vector3(LEFT_WALL_LIMIT, (*particle1)->getPosition().getY(), 0));
+			physicslib::ParticleContact particleContact = physicslib::ParticleContact(particle1->get(), nullptr, 1.3, vs, penetration, contactNormal);
+			m_contactRegister.add(particleContact);
+		}
+		if ((*particle1)->getPosition().getX() > RIGHT_WALL_LIMIT - physicslib::Particle::PARTICLE_RADIUS)
+		{//collision on the right
+			physicslib::Vector3 contactNormal(-1, 0, 0);
+			double vs = contactNormal * (*particle1)->getSpeed();
+			double penetration = 2 * physicslib::Particle::PARTICLE_RADIUS - ((*particle1)->getPosition() - physicslib::Vector3(RIGHT_WALL_LIMIT, (*particle1)->getPosition().getY(), 0)).getNorm();
+			(*particle1)->setPosition(physicslib::Vector3(RIGHT_WALL_LIMIT, (*particle1)->getPosition().getY(), 0));
+			physicslib::ParticleContact particleContact = physicslib::ParticleContact(particle1->get(), nullptr, 1.3, vs, penetration, contactNormal);
+			m_contactRegister.add(particleContact);
+		}
+		particle1++;
+	}
 }
 
 void GameWorld::updateParticlesPosition(const double frametime)
@@ -421,6 +426,7 @@ std::tuple<std::vector<double>, std::vector<unsigned int>> GameWorld::generateBa
 	std::vector<double> vertices;
 	std::vector<unsigned int> indices;
 
+	//floor
 	vertices.push_back(0);
 	vertices.push_back(FLOOR_LEVEL);
 	vertices.push_back(0);
@@ -449,8 +455,7 @@ std::tuple<std::vector<double>, std::vector<unsigned int>> GameWorld::generateBa
 	vertices.push_back(1);
 	vertices.push_back(0);
 
-	// 
-
+	// right wall
 	vertices.push_back(RIGHT_WALL_LIMIT);
 	vertices.push_back(CEILING_LEVEL);
 	vertices.push_back(0);
@@ -479,8 +484,7 @@ std::tuple<std::vector<double>, std::vector<unsigned int>> GameWorld::generateBa
 	vertices.push_back(0.16);
 	vertices.push_back(0);
 
-	//
-
+	// left wall
 	vertices.push_back(0);
 	vertices.push_back(CEILING_LEVEL);
 	vertices.push_back(0);
@@ -509,8 +513,7 @@ std::tuple<std::vector<double>, std::vector<unsigned int>> GameWorld::generateBa
 	vertices.push_back(0.16);
 	vertices.push_back(0);
 
-	//
-
+	// ceilling
 	vertices.push_back(0);
 	vertices.push_back(SCR_HEIGHT);
 	vertices.push_back(0);
@@ -539,8 +542,7 @@ std::tuple<std::vector<double>, std::vector<unsigned int>> GameWorld::generateBa
 	vertices.push_back(0.16);
 	vertices.push_back(0);
 
-	//
-
+	// water
 	vertices.push_back(WATER_LIMIT);
 	vertices.push_back(FLOOR_LEVEL);
 	vertices.push_back(0);
@@ -569,52 +571,42 @@ std::tuple<std::vector<double>, std::vector<unsigned int>> GameWorld::generateBa
 	vertices.push_back(0);
 	vertices.push_back(1);
 
-	// first triangle
+	// floor
 	indices.push_back(0);
 	indices.push_back(1);
 	indices.push_back(3);
-
-	// second triangle
 	indices.push_back(1);
 	indices.push_back(2);
 	indices.push_back(3);
 
-	// third triangle
+	// right wall
 	indices.push_back(4);
 	indices.push_back(5);
 	indices.push_back(7);
-
-	// fourth triangle
 	indices.push_back(5);
 	indices.push_back(6);
 	indices.push_back(7);
 
-	// fith triangle
+	// left wall
 	indices.push_back(8);
 	indices.push_back(9);
 	indices.push_back(11);
-
-	// sixth triangle
 	indices.push_back(9);
 	indices.push_back(10);
 	indices.push_back(11);
 
-	// seventh triangle
+	// ceiling
 	indices.push_back(12);
 	indices.push_back(13);
 	indices.push_back(15);
-
-	// height triangle
 	indices.push_back(13);
 	indices.push_back(14);
 	indices.push_back(15);
 
-	// ninth triangle
+	// water
 	indices.push_back(16);
 	indices.push_back(17);
 	indices.push_back(19);
-
-	// tenth triangle
 	indices.push_back(17);
 	indices.push_back(18);
 	indices.push_back(19);

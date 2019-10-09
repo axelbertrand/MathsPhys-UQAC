@@ -59,6 +59,7 @@ private:
 	void generateGravityAndDragForces();
 	void generateBuoyancyForces();
 	void generateBlobsForces();
+	void detectCollision();
 	void updateParticlesPosition(const double frametime);
 
 	void renderGame() const;
