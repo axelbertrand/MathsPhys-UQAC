@@ -63,19 +63,14 @@ namespace physicslib
 
 	void ParticleContact::resolveVelocity(double frametime)
 	{
-		Vector3 newVelocity1;
-		Vector3 newVelocity2;
 		if (m_particles[0]->getInverseMass() != 0)
 		{
-			newVelocity1 = m_particles[0]->getSpeed() - m_contactNormal * m_particles[0]->getInverseMass() * m_vs;
+			Vector3 newVelocity1 = m_particles[0]->getSpeed() - m_contactNormal * m_particles[0]->getInverseMass() * m_vs * m_restitution;
+			m_particles[0]->setSpeed(newVelocity1);
 		}
 		if (m_particles[1] != nullptr && m_particles[1]->getInverseMass() != 0)
 		{
-			newVelocity2 = m_particles[1]->getSpeed() + m_contactNormal * m_particles[1]->getInverseMass() * m_vs;
-		}
-		m_particles[0]->setSpeed(newVelocity1);
-		if (m_particles[1] != nullptr)
-		{
+			Vector3 newVelocity2 = m_particles[1]->getSpeed() + m_contactNormal * m_particles[1]->getInverseMass() * m_vs * m_restitution;
 			m_particles[1]->setSpeed(newVelocity2);
 		}
 	}
