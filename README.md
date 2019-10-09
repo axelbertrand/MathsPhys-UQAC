@@ -42,15 +42,14 @@ The next steps depend on your environment but you should be able to:
 
 ### Running
 
-While the program is running, press A, Z or E keys to send particles with different initial position and speed. You can send multiple particles in a row to see their trajectories.
+While the program is running, press A to generate a blob : an entity made of particles linked together with spring forces, these links comport lire rods when the elasticity limit is exceeded. The first blob generated can be controlled using keyboard arrows. Pressing Q splits the controlled blob in two separated parts, and pressing S reunites all blobs' particles into a big one.
 
 ## Authors
 
-
-* **BERTRAND Axel**
-* **DE CLERCQ Romain**
-* **DURAND Quentin**
-* **PEREZ Benjamin**
+* **BERTRAND Axel BERA22029804**
+* **DE CLERCQ Romain DECR28099806**
+* **DURAND Quentin DURQ17039607**
+* **PEREZ Benjamin PERB02119501**
 
 ## Links
 The github project : https://github.com/BJPerez/MathsPhy-UQAC

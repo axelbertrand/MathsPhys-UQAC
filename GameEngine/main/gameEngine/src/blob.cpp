@@ -31,6 +31,11 @@ std::shared_ptr<physicslib::Particle> Blob::getCore()
 	return m_coreParticle;
 }
 
+std::vector<std::shared_ptr<physicslib::Particle>> Blob::getParticles() const
+{
+	return m_particles;
+}
+
 std::vector<physicslib::ForceRegister::ForceRecord> Blob::getForceRecords() const
 {
 	std::vector<physicslib::ForceRegister::ForceRecord> res;
@@ -49,3 +54,22 @@ std::vector<physicslib::ForceRegister::ForceRecord> Blob::getForceRecords() cons
 	return res;
 }
 
+double Blob::getLinksElasticity() const
+{
+	return m_linksElasticity;
+}
+double Blob::getLinksRestingLength() const
+{
+	return m_linksRestingLength;
+}
+
+std::vector<physicslib::ParticleCable> Blob::getParticleContacts() const
+{
+	std::vector<physicslib::ParticleCable> res;
+	std::for_each(m_links.begin(), m_links.end(),
+		[&res, this](const std::pair<const std::shared_ptr<physicslib::Particle>, const std::shared_ptr<physicslib::Particle>> link)
+		{
+			res.push_back(physicslib::ParticleCable(link.first.get(), link.second.get(), 2 * m_linksRestingLength, m_linksElasticity * 0.1));
+		});
+	return res;
+}

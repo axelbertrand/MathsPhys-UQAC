@@ -4,8 +4,12 @@
 #include <algorithm>
 #include <tuple>
 #include <cmath>
+#include <iostream>
+
+#include "collisions/particleCable.hpp"
 
 #include "../include/shaderSources.hpp"
+#include "forceGenerator/particleBuoyancyForceGenerator.hpp"
 
 void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
 
@@ -89,13 +93,13 @@ void GameWorld::processIntention(const InputsManager::Intention intention)
 	else if (intention == InputsManager::CREATE_PARTICLE_TWO)
 	{
 		std::shared_ptr<physicslib::Particle> particle = std::make_shared<physicslib::Particle>
-			(1, physicslib::Vector3(30, 400, 0), physicslib::Vector3(100, 0, 0), physicslib::Vector3());
+			(1, physicslib::Vector3(30, 30, 0), physicslib::Vector3(100, 50, 0), physicslib::Vector3());
 		m_particles.push_back(particle);
 	}
 	else if (intention == InputsManager::CREATE_PARTICLE_THREE)
 	{
 		std::shared_ptr<physicslib::Particle> particle = std::make_shared<physicslib::Particle>
-			(1, physicslib::Vector3(30, 30, 0), physicslib::Vector3(100, 100, 0), physicslib::Vector3());
+			(1, physicslib::Vector3(300, 30, 0), physicslib::Vector3(-100, 50, 0), physicslib::Vector3());
 		m_particles.push_back(particle);
 	}
 	else if (intention == InputsManager::MOVE_BLOB_BOTTOM && m_mainBlob != nullptr)
@@ -126,6 +130,32 @@ void GameWorld::processIntention(const InputsManager::Intention intention)
 		physicslib::ForceRegister::ForceRecord record(m_mainBlob->getCore(), moveLeftGenerator);
 		m_forceRegister.add(record);
 	}
+	else if (intention == InputsManager::CUT_MAIN_BLOB && m_mainBlob != nullptr)
+	{
+		separateMainBlob();
+	}
+	else if (intention == InputsManager::FUSION_ALL_BLOB && m_blobs.size() > 1)
+	{
+		std::shared_ptr<physicslib::Particle > coreParticle = m_mainBlob->getCore();
+		std::vector<std::shared_ptr<physicslib::Particle>> particles = m_mainBlob->getParticles();
+		double linkElasticity = m_mainBlob->getLinksElasticity();
+		double linkLength = m_mainBlob->getLinksRestingLength();
+
+		std::for_each(m_blobs.begin(), m_blobs.end(),
+			[this, &particles](const std::shared_ptr<Blob> blob)
+			{
+				if (blob != m_mainBlob)
+				{
+					particles.push_back(blob->getCore());
+					std::vector<std::shared_ptr<physicslib::Particle>> newParticles = blob->getParticles();
+					particles.insert(particles.end(), newParticles.begin(), newParticles.end());
+				}
+			});
+		m_blobs.clear();
+
+		m_mainBlob = std::make_shared<Blob>(coreParticle, particles, linkElasticity, linkLength);
+		m_blobs.push_back(m_mainBlob);
+	}
 }
 
 std::shared_ptr<Blob> GameWorld::createBlob(const unsigned int blobCount)
@@ -138,14 +168,63 @@ std::shared_ptr<Blob> GameWorld::createBlob(const unsigned int blobCount)
 	for (unsigned int count = 0; count < blobCount - 1; ++count)
 	{
 		auto particle = std::make_shared<physicslib::Particle>
-			(1, physicslib::Vector3(450+count, 400+count, 0), physicslib::Vector3(0, 0, 0), physicslib::Vector3());
+			(1, physicslib::Vector3(100+20*count, 100+20*count, 0), physicslib::Vector3(0, 0, 0), physicslib::Vector3());
 		particles.push_back(particle);
 		m_particles.push_back(particle);
 	}
 
-	std::shared_ptr<Blob> blob = std::make_shared<Blob>(coreParticle, particles, 40, 75);
+	std::shared_ptr<Blob> blob = std::make_shared<Blob>(coreParticle, particles, 4, 50);
 	m_blobs.push_back(blob);
 	return blob;
+}
+
+void GameWorld::separateMainBlob()
+{
+	// we cut the main blob in 2 blob
+	std::shared_ptr<physicslib::Particle > coreParticle = m_mainBlob->getCore();
+	std::vector<std::shared_ptr<physicslib::Particle>> particles = m_mainBlob->getParticles();
+	std::shared_ptr<physicslib::Particle> secondCoreParticle = particles.back();
+	particles.pop_back();
+	std::vector<std::shared_ptr<physicslib::Particle>> secondParticles;
+
+	std::vector<std::shared_ptr<physicslib::Particle>>::iterator particleIt = particles.begin();
+	bool transfer = false;
+	while (particleIt != particles.end())
+	{
+		if (transfer)
+		{
+			std::shared_ptr<physicslib::Particle> transferedParticle = *particleIt;
+			particleIt = particles.erase(particleIt);
+			secondParticles.push_back(transferedParticle);
+
+			transferedParticle->setSpeed(physicslib::Vector3(-400, -400, 0)); // impulsion to see the separation of the blob
+		}
+		else
+		{
+			(*particleIt)->setSpeed(physicslib::Vector3(400, 400, 0)); // impulsion to see the separation of the blob
+			++particleIt;
+		}
+		transfer = !transfer;
+	}
+
+	// deleting the old blob from m_blobs
+	for (auto i = m_blobs.begin(); i != m_blobs.end(); ++i)
+	{
+		if ((*i) == m_mainBlob)
+		{
+			m_blobs.erase(i);
+			break;
+		}
+	}
+
+	// adding the new blobs in m_blobs
+	std::shared_ptr<Blob> firstNewBlob = std::make_shared<Blob>(coreParticle, particles,
+		m_mainBlob->getLinksElasticity(), m_mainBlob->getLinksRestingLength());
+	std::shared_ptr<Blob> secondNewBlob = std::make_shared<Blob>(secondCoreParticle, secondParticles,
+		m_mainBlob->getLinksElasticity(), m_mainBlob->getLinksRestingLength());
+	m_mainBlob = firstNewBlob;
+	m_blobs.push_back(firstNewBlob);
+	m_blobs.push_back(secondNewBlob);
 }
 
 void GameWorld::updatePhysics(const double frametime)
@@ -159,7 +238,84 @@ void GameWorld::updatePhysics(const double frametime)
 	// update the position of the particles
 	updateParticlesPosition(frametime);
 
-	//look for collisions
+	// look for collisions and resolve them
+	detectCollision();
+	m_contactRegister.resolveContacts(frametime);
+
+	// clean registers
+	m_contactRegister.clear();
+	m_forceRegister.clear();
+}
+
+void GameWorld::generateAllForces()
+{
+	generateGravityAndDragForces();
+	generateBlobsForces();
+	generateBuoyancyForces();
+}
+
+void GameWorld::generateGravityAndDragForces()
+{
+	std::for_each(m_particles.begin(), m_particles.end(),
+		[this](const auto& particle)
+		{
+			m_forceRegister.add(physicslib::ForceRegister::ForceRecord(particle, gravityGenerator));
+			m_forceRegister.add(physicslib::ForceRegister::ForceRecord(particle, dragGenerator));
+		});
+}
+
+
+void GameWorld::generateBuoyancyForces()
+{
+	std::for_each(m_particles.begin(), m_particles.end(),
+		[this](const auto& particle)
+		{
+			double x = particle->getPosition().getX();
+			double y = particle->getPosition().getY();
+			if (x > WATER_LIMIT && y - physicslib::Particle::PARTICLE_RADIUS < FLOOR_LEVEL)
+			{
+				// buoyancy force
+				double particleVolume = pow(physicslib::Particle::PARTICLE_RADIUS * 2, 3);
+				auto buoyancyForceGenerator = std::make_shared<physicslib::ParticleBuoyancyForceGenerator>
+					(0, particleVolume, FLOOR_LEVEL, 10);
+				physicslib::ForceRegister::ForceRecord record(particle, buoyancyForceGenerator);
+				m_forceRegister.add(record);
+
+				// drag force because water has more drag power than the air
+				auto dragForceGenerator = std::make_shared<physicslib::DragForceGenerator>
+					(0.47, 0);
+				physicslib::ForceRegister::ForceRecord dragRecord(particle, dragForceGenerator);
+				m_forceRegister.add(dragRecord);
+			}
+		});
+}
+
+void GameWorld::generateBlobsForces()
+{
+	if (!m_blobs.empty())
+	{
+		std::for_each(m_blobs.begin(), m_blobs.end(),
+			[this](const auto& blob)
+			{
+				auto records = blob->getForceRecords();
+				std::for_each(records.begin(), records.end(),
+					[this](const auto& record)
+					{
+						m_forceRegister.add(record);
+					});
+
+				auto contactGenerators = blob->getParticleContacts();
+				std::for_each(contactGenerators.begin(), contactGenerators.end(),
+					[this](auto& contactGenerator)
+					{
+						contactGenerator.addContact(m_contactRegister);
+					});
+			});
+	}
+}
+
+void GameWorld::detectCollision()
+{
 	auto particle1 = std::begin(m_particles);
 	while (particle1 != std::end(m_particles))
 	{
@@ -167,17 +323,19 @@ void GameWorld::updatePhysics(const double frametime)
 		while (particle2 != particle1)
 		{
 			if ((*particle1)->isInContactWith(*(particle2->get())))
-			{//collision with another particle
+			{ //collision with another particle
 				physicslib::Vector3 contactNormal = ((*particle1)->getPosition() - (*particle2)->getPosition()).getNormalizedVector();
 				double vs = contactNormal * ((*particle1)->getSpeed() - (*particle2)->getSpeed());
 				double penetration = 2 * physicslib::Particle::PARTICLE_RADIUS - ((*particle1)->getPosition() - (*particle2)->getPosition()).getNorm();
 				physicslib::ParticleContact particleContact = physicslib::ParticleContact(particle1->get(), particle2->get(), 0.7, vs, penetration, contactNormal);
 				m_contactRegister.add(particleContact);
 			}
+
 			particle2++;
 		}
-		if ((*particle1)->getPosition().getY() < FLOOR_LEVEL + physicslib::Particle::PARTICLE_RADIUS)
-		{ //collision on the ground
+		if ((*particle1)->getPosition().getY() < FLOOR_LEVEL + physicslib::Particle::PARTICLE_RADIUS
+			&& (*particle1)->getPosition().getX() < WATER_LIMIT)
+		{  //collision on the ground
 			physicslib::Vector3 contactNormal(0, 1, 0);
 			double vs = contactNormal * (*particle1)->getSpeed();
 			double penetration = 2 * physicslib::Particle::PARTICLE_RADIUS - ((*particle1)->getPosition() - physicslib::Vector3((*particle1)->getPosition().getX(), FLOOR_LEVEL, 0)).getNorm();
@@ -213,44 +371,6 @@ void GameWorld::updatePhysics(const double frametime)
 			m_contactRegister.add(particleContact);
 		}
 		particle1++;
-	}
-	m_contactRegister.resolveContacts(frametime);
-
-	// cleaning registers
-	m_contactRegister.clear();
-	m_forceRegister.clear();
-}
-
-void GameWorld::generateAllForces()
-{
-	generateGravityAndDragForces();
-	generateBlobsForces();
-}
-
-void GameWorld::generateGravityAndDragForces()
-{
-	std::for_each(m_particles.begin(), m_particles.end(),
-		[this](const auto& particle)
-		{
-			m_forceRegister.add(physicslib::ForceRegister::ForceRecord(particle, gravityGenerator));
-			m_forceRegister.add(physicslib::ForceRegister::ForceRecord(particle, dragGenerator));
-		});
-}
-
-void GameWorld::generateBlobsForces()
-{
-	if (!m_blobs.empty())
-	{
-		std::for_each(m_blobs.begin(), m_blobs.end(),
-			[this](const auto& blob)
-			{
-				auto records = blob->getForceRecords();
-				std::for_each(records.begin(), records.end(),
-					[this](const auto& record)
-					{
-						m_forceRegister.add(record);
-					});
-			});
 	}
 }
 
@@ -392,6 +512,7 @@ std::tuple<std::vector<double>, std::vector<unsigned int>> GameWorld::generateBa
 	std::vector<double> vertices;
 	std::vector<unsigned int> indices;
 
+	//floor
 	vertices.push_back(0);
 	vertices.push_back(FLOOR_LEVEL);
 	vertices.push_back(0);
@@ -399,14 +520,14 @@ std::tuple<std::vector<double>, std::vector<unsigned int>> GameWorld::generateBa
 	vertices.push_back(1);
 	vertices.push_back(0);
 
-	vertices.push_back(SCR_WIDTH);
+	vertices.push_back(WATER_LIMIT);
 	vertices.push_back(FLOOR_LEVEL);
 	vertices.push_back(0);
 	vertices.push_back(0);
 	vertices.push_back(1);
 	vertices.push_back(0);
 
-	vertices.push_back(SCR_WIDTH);
+	vertices.push_back(WATER_LIMIT);
 	vertices.push_back(0);
 	vertices.push_back(0);
 	vertices.push_back(0);
@@ -420,8 +541,7 @@ std::tuple<std::vector<double>, std::vector<unsigned int>> GameWorld::generateBa
 	vertices.push_back(1);
 	vertices.push_back(0);
 
-	// 
-
+	// right wall
 	vertices.push_back(RIGHT_WALL_LIMIT);
 	vertices.push_back(CEILING_LEVEL);
 	vertices.push_back(0);
@@ -450,8 +570,7 @@ std::tuple<std::vector<double>, std::vector<unsigned int>> GameWorld::generateBa
 	vertices.push_back(0.16);
 	vertices.push_back(0);
 
-	//
-
+	// left wall
 	vertices.push_back(0);
 	vertices.push_back(CEILING_LEVEL);
 	vertices.push_back(0);
@@ -480,8 +599,7 @@ std::tuple<std::vector<double>, std::vector<unsigned int>> GameWorld::generateBa
 	vertices.push_back(0.16);
 	vertices.push_back(0);
 
-	//
-
+	// ceilling
 	vertices.push_back(0);
 	vertices.push_back(SCR_HEIGHT);
 	vertices.push_back(0);
@@ -510,45 +628,74 @@ std::tuple<std::vector<double>, std::vector<unsigned int>> GameWorld::generateBa
 	vertices.push_back(0.16);
 	vertices.push_back(0);
 
-	// first triangle
+	// water
+	vertices.push_back(WATER_LIMIT);
+	vertices.push_back(FLOOR_LEVEL);
+	vertices.push_back(0);
+	vertices.push_back(0);
+	vertices.push_back(0);
+	vertices.push_back(1);
+
+	vertices.push_back(SCR_WIDTH);
+	vertices.push_back(FLOOR_LEVEL);
+	vertices.push_back(0);
+	vertices.push_back(0);
+	vertices.push_back(0);
+	vertices.push_back(1);
+
+	vertices.push_back(SCR_WIDTH);
+	vertices.push_back(0);
+	vertices.push_back(0);
+	vertices.push_back(0);
+	vertices.push_back(0);
+	vertices.push_back(1);
+
+	vertices.push_back(WATER_LIMIT);
+	vertices.push_back(0);
+	vertices.push_back(0);
+	vertices.push_back(0);
+	vertices.push_back(0);
+	vertices.push_back(1);
+
+	// floor
 	indices.push_back(0);
 	indices.push_back(1);
 	indices.push_back(3);
-
-	// second triangle
 	indices.push_back(1);
 	indices.push_back(2);
 	indices.push_back(3);
 
-	// third triangle
+	// right wall
 	indices.push_back(4);
 	indices.push_back(5);
 	indices.push_back(7);
-
-	// fourth triangle
 	indices.push_back(5);
 	indices.push_back(6);
 	indices.push_back(7);
 
-	// fith triangle
+	// left wall
 	indices.push_back(8);
 	indices.push_back(9);
 	indices.push_back(11);
-
-	// sixth triangle
 	indices.push_back(9);
 	indices.push_back(10);
 	indices.push_back(11);
 
-	// seventh triangle
+	// ceiling
 	indices.push_back(12);
 	indices.push_back(13);
 	indices.push_back(15);
-
-	// height triangle
 	indices.push_back(13);
 	indices.push_back(14);
 	indices.push_back(15);
+
+	// water
+	indices.push_back(16);
+	indices.push_back(17);
+	indices.push_back(19);
+	indices.push_back(17);
+	indices.push_back(18);
+	indices.push_back(19);
 
 	return { vertices, indices };
 }
@@ -571,6 +718,14 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
 	else if (key == GLFW_KEY_E && action == GLFW_PRESS)
 	{
 		inputsManager->addIntention(InputsManager::Intention::CREATE_PARTICLE_THREE);
+	}
+	else if (key == GLFW_KEY_A && action == GLFW_PRESS)
+	{
+		inputsManager->addIntention(InputsManager::Intention::CUT_MAIN_BLOB);
+	}
+	else if (key == GLFW_KEY_S && action == GLFW_PRESS)
+	{
+		inputsManager->addIntention(InputsManager::Intention::FUSION_ALL_BLOB);
 	}
 
 }
