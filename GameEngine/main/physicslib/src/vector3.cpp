@@ -1,6 +1,6 @@
 #include <iostream>
 #include <math.h>
-#include "..\include\vector3.hpp"
+#include "../include/vector3.hpp"
 namespace physicslib
 {
 	Vector3::Vector3() {};

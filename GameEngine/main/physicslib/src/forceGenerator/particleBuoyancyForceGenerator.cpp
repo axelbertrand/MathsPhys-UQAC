@@ -13,14 +13,17 @@ namespace physicslib
 	{
 		//the particle is aproximated by a cube of equal volume
 		double cubeEdge = pow(m_objectVolume, 1 / 3);
-		double submergedProportion = (particle->getPosition().getZ() - m_liquidHeight - cubeEdge/2.)/cubeEdge; // Doute, peut être l'opposé
+		double submergedProportion = (particle->getPosition().getZ() - m_liquidHeight - cubeEdge/2.)/cubeEdge; // Doute, peut ï¿½tre l'opposï¿½
+		Vector3 zeroVector(0,0,1);
 		if (submergedProportion <= 1 && submergedProportion >= 0)
 		{
-			particle->addForce(Vector3::Vector3(0,0,1) * submergedProportion * m_objectVolume * m_liquidDensity);
+			//particle->addForce(Vector3::Vector3(0,0,1) * submergedProportion * m_objectVolume * m_liquidDensity);
+			particle->addForce(zeroVector * submergedProportion * m_objectVolume * m_liquidDensity);
 		}
 		else if (submergedProportion >= 1)
 		{
-			particle->addForce(Vector3::Vector3(0, 0, 1) * m_objectVolume * m_liquidDensity);
+			//particle->addForce(Vector3::Vector3(0, 0, 1) * m_objectVolume * m_liquidDensity);
+			particle->addForce(zeroVector * m_objectVolume * m_liquidDensity);
 		}
 	}
 }

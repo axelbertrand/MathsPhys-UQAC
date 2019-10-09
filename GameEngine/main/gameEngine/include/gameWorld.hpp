@@ -4,7 +4,7 @@
 #include <vector>
 #include <unordered_map>
 
-#include "openGlWrapper.hpp"
+#include "OpenGlWrapper.hpp"
 #include "particle.hpp"
 #include "forceGenerator/particleForceGenerator.hpp"
 #include "forceGenerator/gravityForceGenerator.hpp"

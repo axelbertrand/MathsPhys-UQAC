@@ -43,12 +43,6 @@ std::vector<physicslib::ForceRegister::ForceRecord> Blob::getForceRecords() cons
 			physicslib::ForceRegister::ForceRecord record2(link.second,
 				std::make_shared<const physicslib::ParticleSpringForceGenerator>
 				(physicslib::ParticleSpringForceGenerator(link.first, m_linksElasticity, m_linksRestingLength)));
-			physicslib::ForceRegister::ForceRecord record1(link.first,
-				std::make_shared<const physicslib::ParticleSpringForceGenerator>
-				(physicslib::ParticleSpringForceGenerator(link.second, m_linksElasticity, m_linksRestingLength)));
-			physicslib::ForceRegister::ForceRecord record2(link.second,
-				std::make_shared<const physicslib::ParticleSpringForceGenerator>
-				(physicslib::ParticleSpringForceGenerator(link.first, m_linksElasticity, m_linksRestingLength)));
 			res.push_back(record1);
 			res.push_back(record2);
 		});
