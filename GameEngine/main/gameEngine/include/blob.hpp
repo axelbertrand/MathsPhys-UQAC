@@ -15,7 +15,10 @@ public:
 		double linksElasticity, double linksRestingLength);
 
 	std::shared_ptr<physicslib::Particle> getCore();
+	std::vector<std::shared_ptr<physicslib::Particle>> getParticles() const;
 	std::vector<physicslib::ForceRegister::ForceRecord> getForceRecords() const;
+	double getLinksElasticity() const;
+	double getLinksRestingLength() const;
 	std::vector<physicslib::ParticleCable> getParticleContacts() const;
 
 private:
