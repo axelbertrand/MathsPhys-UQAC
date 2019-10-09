@@ -63,3 +63,13 @@ double Blob::getLinksRestingLength() const
 	return m_linksRestingLength;
 }
 
+std::vector<physicslib::ParticleCable> Blob::getParticleContacts() const
+{
+	std::vector<physicslib::ParticleCable> res;
+	std::for_each(m_links.begin(), m_links.end(),
+		[&res, this](const std::pair<const std::shared_ptr<physicslib::Particle>, const std::shared_ptr<physicslib::Particle>> link)
+		{
+			res.push_back(physicslib::ParticleCable(link.first.get(), link.second.get(), 2 * m_linksRestingLength, m_linksElasticity * 0.1));
+		});
+	return res;
+}
