@@ -43,15 +43,19 @@ std::vector<physicslib::ForceRegister::ForceRecord> Blob::getForceRecords() cons
 			physicslib::ForceRegister::ForceRecord record2(link.second,
 				std::make_shared<const physicslib::ParticleSpringForceGenerator>
 				(physicslib::ParticleSpringForceGenerator(link.first, m_linksElasticity, m_linksRestingLength)));
-			physicslib::ForceRegister::ForceRecord record1(link.first,
-				std::make_shared<const physicslib::ParticleSpringForceGenerator>
-				(physicslib::ParticleSpringForceGenerator(link.second, m_linksElasticity, m_linksRestingLength)));
-			physicslib::ForceRegister::ForceRecord record2(link.second,
-				std::make_shared<const physicslib::ParticleSpringForceGenerator>
-				(physicslib::ParticleSpringForceGenerator(link.first, m_linksElasticity, m_linksRestingLength)));
 			res.push_back(record1);
 			res.push_back(record2);
 		});
 	return res;
 }
 
+std::vector<physicslib::ParticleCable> Blob::getParticleContacts() const
+{
+	std::vector<physicslib::ParticleCable> res;
+	std::for_each(m_links.begin(), m_links.end(),
+		[&res, this](const std::pair<const std::shared_ptr<physicslib::Particle>, const std::shared_ptr<physicslib::Particle>> link)
+		{
+			res.push_back(physicslib::ParticleCable(link.first.get(), link.second.get(), 2 * m_linksRestingLength, m_linksElasticity * 0.1));
+		});
+	return res;
+}

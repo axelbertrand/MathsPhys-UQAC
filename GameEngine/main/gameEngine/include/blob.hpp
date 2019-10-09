@@ -4,6 +4,7 @@
 #include <tuple>
 
 #include "particle.hpp"
+#include "collisions/particleCable.hpp"
 #include "forceGenerator/forceRegister.hpp"
 
 class Blob
@@ -15,6 +16,7 @@ public:
 
 	std::shared_ptr<physicslib::Particle> getCore();
 	std::vector<physicslib::ForceRegister::ForceRecord> getForceRecords() const;
+	std::vector<physicslib::ParticleCable> getParticleContacts() const;
 
 private:
 	const std::shared_ptr<physicslib::Particle> m_coreParticle;
