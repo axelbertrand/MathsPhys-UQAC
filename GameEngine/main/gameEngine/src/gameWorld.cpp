@@ -112,9 +112,9 @@ void GameWorld::updatePhysics(const double frametime)
 
 	//look for collisions
 	auto particle1 = std::begin(m_particles);
-	auto particle2 = std::begin(m_particles);
 	while (particle1 != std::end(m_particles))
 	{
+		auto particle2 = std::begin(m_particles);
 		while (particle2 != particle1)
 		{
 			if ((*particle1)->isInContactWith(*(particle2->get())))
