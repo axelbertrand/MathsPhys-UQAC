@@ -4,8 +4,10 @@
 #include <algorithm>
 #include <tuple>
 #include <cmath>
+#include <iostream>
 
 #include "../include/shaderSources.hpp"
+#include "forceGenerator/particleBuoyancyForceGenerator.hpp"
 
 void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
 
@@ -176,7 +178,8 @@ void GameWorld::updatePhysics(const double frametime)
 			}
 			particle2++;
 		}
-		if ((*particle1)->getPosition().getY() < FLOOR_LEVEL + physicslib::Particle::PARTICLE_RADIUS)
+		if ((*particle1)->getPosition().getY() < FLOOR_LEVEL + physicslib::Particle::PARTICLE_RADIUS 
+				&& (*particle1)->getPosition().getX() < WATER_LIMIT)
 		{ //collision on the ground
 			physicslib::Vector3 contactNormal(0, 1, 0);
 			double vs = contactNormal * (*particle1)->getSpeed();
@@ -225,6 +228,7 @@ void GameWorld::generateAllForces()
 {
 	generateGravityAndDragForces();
 	generateBlobsForces();
+	generateBuoyancyForces();
 }
 
 void GameWorld::generateGravityAndDragForces()
@@ -252,6 +256,31 @@ void GameWorld::generateBlobsForces()
 					});
 			});
 	}
+}
+
+void GameWorld::generateBuoyancyForces()
+{
+	std::for_each(m_particles.begin(), m_particles.end(),
+		[this](const auto& particle)
+		{
+			double x = particle->getPosition().getX();
+			double y = particle->getPosition().getY();
+			if (x > WATER_LIMIT && y - physicslib::Particle::PARTICLE_RADIUS < FLOOR_LEVEL)
+			{
+				// buoyancy force
+				double particleVolume = pow(physicslib::Particle::PARTICLE_RADIUS * 2, 3);
+				auto buoyancyForceGenerator = std::make_shared<physicslib::ParticleBuoyancyForceGenerator>
+					(0, particleVolume, FLOOR_LEVEL, 10);
+				physicslib::ForceRegister::ForceRecord record(particle, buoyancyForceGenerator);
+				m_forceRegister.add(record);
+
+				// drag force because water has more drag power than the air
+				auto dragForceGenerator = std::make_shared<physicslib::DragForceGenerator>
+					(0.47, 0);
+				physicslib::ForceRegister::ForceRecord dragRecord(particle, dragForceGenerator);
+				m_forceRegister.add(dragRecord);
+			}
+		});
 }
 
 void GameWorld::updateParticlesPosition(const double frametime)
@@ -399,14 +428,14 @@ std::tuple<std::vector<double>, std::vector<unsigned int>> GameWorld::generateBa
 	vertices.push_back(1);
 	vertices.push_back(0);
 
-	vertices.push_back(SCR_WIDTH);
+	vertices.push_back(WATER_LIMIT);
 	vertices.push_back(FLOOR_LEVEL);
 	vertices.push_back(0);
 	vertices.push_back(0);
 	vertices.push_back(1);
 	vertices.push_back(0);
 
-	vertices.push_back(SCR_WIDTH);
+	vertices.push_back(WATER_LIMIT);
 	vertices.push_back(0);
 	vertices.push_back(0);
 	vertices.push_back(0);
@@ -510,6 +539,36 @@ std::tuple<std::vector<double>, std::vector<unsigned int>> GameWorld::generateBa
 	vertices.push_back(0.16);
 	vertices.push_back(0);
 
+	//
+
+	vertices.push_back(WATER_LIMIT);
+	vertices.push_back(FLOOR_LEVEL);
+	vertices.push_back(0);
+	vertices.push_back(0);
+	vertices.push_back(0);
+	vertices.push_back(1);
+
+	vertices.push_back(SCR_WIDTH);
+	vertices.push_back(FLOOR_LEVEL);
+	vertices.push_back(0);
+	vertices.push_back(0);
+	vertices.push_back(0);
+	vertices.push_back(1);
+
+	vertices.push_back(SCR_WIDTH);
+	vertices.push_back(0);
+	vertices.push_back(0);
+	vertices.push_back(0);
+	vertices.push_back(0);
+	vertices.push_back(1);
+
+	vertices.push_back(WATER_LIMIT);
+	vertices.push_back(0);
+	vertices.push_back(0);
+	vertices.push_back(0);
+	vertices.push_back(0);
+	vertices.push_back(1);
+
 	// first triangle
 	indices.push_back(0);
 	indices.push_back(1);
@@ -549,6 +608,16 @@ std::tuple<std::vector<double>, std::vector<unsigned int>> GameWorld::generateBa
 	indices.push_back(13);
 	indices.push_back(14);
 	indices.push_back(15);
+
+	// ninth triangle
+	indices.push_back(16);
+	indices.push_back(17);
+	indices.push_back(19);
+
+	// tenth triangle
+	indices.push_back(17);
+	indices.push_back(18);
+	indices.push_back(19);
 
 	return { vertices, indices };
 }
