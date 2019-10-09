@@ -8,9 +8,9 @@ namespace physicslib
 	class ParticleContact
 	{
 	public:
-		ParticleContact(Particle* particle1, Particle* particle2, double restitution = 0.5);
+		ParticleContact(Particle* particle1, Particle* particle2, double restitution, double vs, double penetratition, Vector3 normal);
 		void resolve(double frametime);
-		void calculateVariables();
+		//void calculateVariables();
 		void resolveInterpenetration();
 		void resolveVelocity(double frametime);
 		virtual ~ParticleContact();
