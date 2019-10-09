@@ -98,13 +98,13 @@ void GameWorld::processIntention(const InputsManager::Intention intention)
 	else if (intention == InputsManager::CREATE_PARTICLE_TWO)
 	{
 		std::shared_ptr<physicslib::Particle> particle = std::make_shared<physicslib::Particle>
-			(1, physicslib::Vector3(10, 400, 0), physicslib::Vector3(100, 0, 0), physicslib::Vector3());
+			(1, physicslib::Vector3(30, 400, 0), physicslib::Vector3(100, 0, 0), physicslib::Vector3());
 		m_particles.push_back(particle);
 	}
 	else if (intention == InputsManager::CREATE_PARTICLE_THREE)
 	{
 		std::shared_ptr<physicslib::Particle> particle = std::make_shared<physicslib::Particle>
-			(1, physicslib::Vector3(10, 10, 0), physicslib::Vector3(100, 100, 0), physicslib::Vector3());
+			(1, physicslib::Vector3(30, 30, 0), physicslib::Vector3(100, 100, 0), physicslib::Vector3());
 		m_particles.push_back(particle);
 	}
 }
@@ -120,7 +120,7 @@ void GameWorld::updatePhysics(const double frametime)
 	// update the position of the particles
 	updateParticlesPosition(frametime);
 
-	// looking for collisions 
+	//look for collisions
 	auto particle1 = std::begin(m_particles);
 	auto particle2 = std::begin(m_particles);
 	while (particle1 != std::end(m_particles))
@@ -128,18 +128,51 @@ void GameWorld::updatePhysics(const double frametime)
 		while (particle2 != particle1)
 		{
 			if ((*particle1)->isInContactWith(*(particle2->get())))
-			{
-				physicslib::ParticleContact particleContact = physicslib::ParticleContact(particle1->get(), particle2->get(), 1);
+			{//collision with another particle
+				physicslib::Vector3 contactNormal = ((*particle1)->getPosition() - (*particle2)->getPosition()).getNormalizedVector();
+				double vs = contactNormal * ((*particle1)->getSpeed() - (*particle2)->getSpeed());
+				double penetration = 2 * physicslib::Particle::PARTICLE_RADIUS - ((*particle1)->getPosition() - (*particle2)->getPosition()).getNorm();
+				physicslib::ParticleContact particleContact = physicslib::ParticleContact(particle1->get(), particle2->get(), 0.9, vs, penetration, contactNormal);
 				m_contactRegister.add(particleContact);
 			}
 			particle2++;
 		}
-		/*if ((*particle1)->getPosition().getY() < 10)
-		{
-			physicslib::Particle particleGround = physicslib::Particle(0, physicslib::Vector3((*particle1)->getPosition().getX(), (*particle1)->getPosition().getY()-1, 0));
-			physicslib::ParticleContact particleContact = physicslib::ParticleContact(particle1->get(), &particleGround, 0.5);
-			contactRegister.add(particleContact);
-		}*/
+		if ((*particle1)->getPosition().getY() < FLOOR_LEVEL + physicslib::Particle::PARTICLE_RADIUS)
+		{ //collision on the ground
+			physicslib::Vector3 contactNormal(0, 1, 0);
+			double vs = contactNormal * (*particle1)->getSpeed();
+			double penetration = 2 * physicslib::Particle::PARTICLE_RADIUS - ((*particle1)->getPosition() - physicslib::Vector3((*particle1)->getPosition().getX(), FLOOR_LEVEL, 0)).getNorm();
+			(*particle1)->setPosition(physicslib::Vector3((*particle1)->getPosition().getX(), FLOOR_LEVEL, 0));
+			physicslib::ParticleContact particleContact = physicslib::ParticleContact(particle1->get(), nullptr, 0.5, vs, penetration, contactNormal);
+			m_contactRegister.add(particleContact);
+		}
+		if ((*particle1)->getPosition().getY() > CEILING_LEVEL - physicslib::Particle::PARTICLE_RADIUS)
+		{//collision on the ceiling
+			physicslib::Vector3 contactNormal(0, -1, 0);
+			double vs = contactNormal * (*particle1)->getSpeed();
+			double penetration = 2 * physicslib::Particle::PARTICLE_RADIUS - ((*particle1)->getPosition() - physicslib::Vector3((*particle1)->getPosition().getX(), CEILING_LEVEL, 0)).getNorm();
+			(*particle1)->setPosition(physicslib::Vector3((*particle1)->getPosition().getX(), CEILING_LEVEL, 0));
+			physicslib::ParticleContact particleContact = physicslib::ParticleContact(particle1->get(), nullptr, 0.9, vs, penetration, contactNormal);
+			m_contactRegister.add(particleContact);
+		}
+		if ((*particle1)->getPosition().getX() < LEFT_WALL_LIMIT + physicslib::Particle::PARTICLE_RADIUS)
+		{//collision on the left
+			physicslib::Vector3 contactNormal(1, 0, 0);
+			double vs = contactNormal * (*particle1)->getSpeed();
+			double penetration = 2 * physicslib::Particle::PARTICLE_RADIUS - ((*particle1)->getPosition() - physicslib::Vector3(LEFT_WALL_LIMIT, (*particle1)->getPosition().getY(), 0)).getNorm();
+			(*particle1)->setPosition(physicslib::Vector3(LEFT_WALL_LIMIT, (*particle1)->getPosition().getY(), 0));
+			physicslib::ParticleContact particleContact = physicslib::ParticleContact(particle1->get(), nullptr, 0.9, vs, penetration, contactNormal);
+			m_contactRegister.add(particleContact);
+		}
+		if ((*particle1)->getPosition().getX() > RIGHT_WALL_LIMIT - physicslib::Particle::PARTICLE_RADIUS)
+		{//collision on the right
+			physicslib::Vector3 contactNormal(-1, 0, 0);
+			double vs = contactNormal * (*particle1)->getSpeed();
+			double penetration = 2 * physicslib::Particle::PARTICLE_RADIUS - ((*particle1)->getPosition() - physicslib::Vector3(RIGHT_WALL_LIMIT, (*particle1)->getPosition().getY(), 0)).getNorm();
+			(*particle1)->setPosition(physicslib::Vector3(RIGHT_WALL_LIMIT, (*particle1)->getPosition().getY(), 0));
+			physicslib::ParticleContact particleContact = physicslib::ParticleContact(particle1->get(), nullptr, 0.9, vs, penetration, contactNormal);
+			m_contactRegister.add(particleContact);
+		}
 		particle1++;
 	}
 	m_contactRegister.resolveContacts(frametime);

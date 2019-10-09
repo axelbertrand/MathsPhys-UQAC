@@ -31,6 +31,9 @@ private:
 	const unsigned int SCR_WIDTH = 800;
 	const unsigned int SCR_HEIGHT = 600;
 	const unsigned int FLOOR_LEVEL = 10;
+	const unsigned int CEILING_LEVEL = 590;
+	const unsigned int LEFT_WALL_LIMIT = 10;
+	const unsigned int RIGHT_WALL_LIMIT = 790;
 	const std::string WINDOW_TITLE = "Game Engine Demo";
 	std::unordered_map<ShaderProgrammType, opengl_wrapper::ShaderProgram_t> m_shaderProgramms;
 	physicslib::ForceRegister m_forceRegister;
