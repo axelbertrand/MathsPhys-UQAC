@@ -28,7 +28,7 @@ namespace opengl_wrapper
 		{
 			char infoLog[512];
 			glGetShaderInfoLog(vertex, 512, nullptr, infoLog);
-			std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
+			std::cerr << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
 
 			return false;
 		};
@@ -44,7 +44,7 @@ namespace opengl_wrapper
 		{
 			char infoLog[512];
 			glGetShaderInfoLog(fragment, 512, nullptr, infoLog);
-			std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << infoLog << std::endl;
+			std::cerr << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << infoLog << std::endl;
 
 			return false;
 		};
@@ -61,7 +61,7 @@ namespace opengl_wrapper
 		{
 			char infoLog[512];
 			glGetProgramInfoLog(m_shaderId, 512, NULL, infoLog);
-			std::cout << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n" << infoLog << std::endl;
+			std::cerr << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n" << infoLog << std::endl;
 
 			return false;
 		}
@@ -69,22 +69,24 @@ namespace opengl_wrapper
 		// Delete the shaders as they're linked into our program now and no longer necessery
 		glDeleteShader(vertex);
 		glDeleteShader(fragment);
+
+		return true;
 	}
 
 	bool Shader::loadFromFile(const std::string& vertexShaderFilename, const std::string& fragmentShaderFilename)
 	{
 		std::ifstream vertexShaderFile(vertexShaderFilename, std::ifstream::in);
-		if (vertexShaderFile.is_open())
+		if (!vertexShaderFile.is_open())
 		{
-			std::cout << "ERROR::SHADER::VERTEX::FILE_NOT_SUCCESFULLY_OPENED" << std::endl;
+			std::cerr << "ERROR::SHADER::VERTEX::FILE_NOT_SUCCESFULLY_OPENED" << std::endl;
 
 			return false;
 		}
 
 		std::ifstream fragmentShaderFile(fragmentShaderFilename, std::ifstream::in);
-		if (fragmentShaderFile.is_open())
+		if (!fragmentShaderFile.is_open())
 		{
-			std::cout << "ERROR::SHADER::FRAGMENT::FILE_NOT_SUCCESFULLY_OPENED" << std::endl;
+			std::cerr << "ERROR::SHADER::FRAGMENT::FILE_NOT_SUCCESFULLY_OPENED" << std::endl;
 
 			return false;
 		}
