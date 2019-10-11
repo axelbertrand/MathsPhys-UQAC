@@ -49,51 +49,6 @@ namespace opengl_wrapper
 		glfwTerminate();
 	}
 
-	ShaderProgram_t OpenGlWrapper::createShadersProgram(const char* vertexShaderSource, const char* fragmentShaderSource) const
-	{
-		// build and compile our shader program
-		// ------------------------------------
-		// vertex shader
-		int vertexShader = glCreateShader(GL_VERTEX_SHADER);
-		glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
-		glCompileShader(vertexShader);
-		// check for shader compile errors
-		int success;
-		char infoLog[512];
-		glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
-		if (!success)
-		{
-			glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
-			std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
-		}
-		// fragment shader
-		int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-		glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
-		glCompileShader(fragmentShader);
-		// check for shader compile errors
-		glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
-		if (!success)
-		{
-			glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
-			std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << infoLog << std::endl;
-		}
-		// link shaders
-		ShaderProgram_t shaderProgram = glCreateProgram();
-		glAttachShader(shaderProgram, vertexShader);
-		glAttachShader(shaderProgram, fragmentShader);
-		glLinkProgram(shaderProgram);
-		// check for linking errors
-		glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
-		if (!success) {
-			glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
-			std::cout << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n" << infoLog << std::endl;
-		}
-		glDeleteShader(vertexShader);
-		glDeleteShader(fragmentShader);
-
-		return shaderProgram;
-	}
-
 	GLFWwindow* OpenGlWrapper::getMainWindow() const
 	{
 		return m_mainWindow;
@@ -108,11 +63,6 @@ namespace opengl_wrapper
 	{
 		glClearColor(red, green, blue, opacity);
 		glClear(GL_COLOR_BUFFER_BIT);
-	}
-
-	void OpenGlWrapper::useShadersProgram(ShaderProgram_t shadersProgram) const
-	{
-		glUseProgram(shadersProgram);
 	}
 
 	std::tuple<unsigned int, unsigned int> OpenGlWrapper::getWindowSize(GLFWwindow* const window) const
