@@ -5,6 +5,7 @@
 #include <unordered_map>
 
 #include "OpenGlWrapper.hpp"
+#include "shader.hpp"
 #include "particle.hpp"
 #include "forceGenerator/particleForceGenerator.hpp"
 #include "forceGenerator/gravityForceGenerator.hpp"
@@ -22,7 +23,7 @@ public:
 
 	void run();
 private:
-	enum ShaderProgrammType
+	enum ShaderProgramType
 	{
 		PARTICLE,
 		BACKGROUND
@@ -36,7 +37,7 @@ private:
 	const unsigned int RIGHT_WALL_LIMIT = 790;
 	const unsigned int WATER_LIMIT = 600;
 	const std::string WINDOW_TITLE = "Game Engine Demo";
-	std::unordered_map<ShaderProgrammType, opengl_wrapper::ShaderProgram_t> m_shaderProgramms;
+	std::unordered_map<ShaderProgramType, opengl_wrapper::Shader> m_shaderPrograms;
 	physicslib::ForceRegister m_forceRegister;
 	physicslib::ContactRegister m_contactRegister;
 	std::shared_ptr<physicslib::GravityForceGenerator> gravityGenerator = std::make_shared<physicslib::GravityForceGenerator>(physicslib::Vector3(0, -20, 0));

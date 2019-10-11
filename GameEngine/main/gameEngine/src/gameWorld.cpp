@@ -17,12 +17,16 @@ GameWorld::GameWorld(): m_openGlWrapper(SCR_WIDTH, SCR_HEIGHT, WINDOW_TITLE), m_
 {
 	// Initialize graphics
 	m_openGlWrapper.setKeyboardCallback(m_mainWindow, keyCallback);
-	m_shaderProgramms.insert(std::make_pair<ShaderProgrammType, opengl_wrapper::ShaderProgram_t>
-		(ShaderProgrammType::PARTICLE, m_openGlWrapper.createShadersProgram
-		(particleVertexShaderSource, particleFragmentShaderSource)));
-	m_shaderProgramms.insert(std::make_pair<ShaderProgrammType, opengl_wrapper::ShaderProgram_t>
-		(ShaderProgrammType::BACKGROUND, m_openGlWrapper.createShadersProgram
-		(backgroundVertexShaderSource, backgroundFragmentShaderSource)));
+
+	// Register particle shader
+	opengl_wrapper::Shader particleShader;
+	particleShader.loadFromString(particleVertexShaderSource, particleFragmentShaderSource);
+	m_shaderPrograms.insert(std::make_pair(ShaderProgramType::PARTICLE, particleShader));
+
+	// Register background shader
+	opengl_wrapper::Shader backgroundShader;
+	backgroundShader.loadFromString(backgroundVertexShaderSource, backgroundFragmentShaderSource);
+	m_shaderPrograms.insert(std::make_pair(ShaderProgramType::BACKGROUND, backgroundShader));
 
 	// Game variables
 	glfwSetWindowUserPointer(m_mainWindow, &m_inputsManager); //save the manager's pointer to the window to be able to access it in the inputs callback function
@@ -406,7 +410,8 @@ void GameWorld::renderGame() const
 
 void GameWorld::drawBackground() const
 {
-	m_openGlWrapper.useShadersProgram(m_shaderProgramms.at(ShaderProgrammType::BACKGROUND));
+	opengl_wrapper::Shader backgroundShader = m_shaderPrograms.at(ShaderProgramType::BACKGROUND);
+	backgroundShader.use();
 	auto buffers = generateBackgroundBuffers();
 	std::vector<double> verticesBuffer = std::get<0>(buffers);
 	std::vector<unsigned int> indicesBuffer = std::get<1>(buffers);
@@ -417,13 +422,13 @@ void GameWorld::drawBackground() const
 
 void GameWorld::drawParticles() const
 {
-	m_openGlWrapper.useShadersProgram(m_shaderProgramms.at(ShaderProgrammType::PARTICLE));
+	opengl_wrapper::Shader particleShader = m_shaderPrograms.at(ShaderProgramType::PARTICLE);
+	particleShader.use();
 	auto buffers = generateParticlesBuffers();
 	std::vector<double> verticesBuffer = std::get<0>(buffers);
 	std::vector<unsigned int> indicesBuffer = std::get<1>(buffers);
 	auto openglBuffers = m_openGlWrapper.createAndBindParticlesDataBuffers(verticesBuffer, indicesBuffer);
-	m_openGlWrapper.setUniformShaderVariable(m_shaderProgramms.at(ShaderProgrammType::PARTICLE), "circleRadius",
-		physicslib::Particle::PARTICLE_RADIUS);
+	particleShader.setUniform("circleRadius", static_cast<float>(physicslib::Particle::PARTICLE_RADIUS));
 	m_openGlWrapper.draw(GL_TRIANGLES, static_cast<unsigned int>(indicesBuffer.size()));
 	m_openGlWrapper.cleanAndDeleteDataBuffers(openglBuffers);
 }

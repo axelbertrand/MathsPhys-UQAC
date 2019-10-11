@@ -6,7 +6,7 @@
 
 namespace opengl_wrapper
 {
-	using ShaderID = unsigned int;
+	using ShaderID = GLuint;
 
 	class Shader
 	{
