@@ -23,7 +23,7 @@ public:
 
 	void run();
 private:
-	enum ShaderProgramType
+	enum class ShaderProgramType
 	{
 		PARTICLE,
 		BACKGROUND

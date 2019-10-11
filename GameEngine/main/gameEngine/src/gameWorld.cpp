@@ -8,7 +8,6 @@
 
 #include "collisions/particleCable.hpp"
 
-#include "../include/shaderSources.hpp"
 #include "forceGenerator/particleBuoyancyForceGenerator.hpp"
 
 void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
@@ -20,12 +19,12 @@ GameWorld::GameWorld(): m_openGlWrapper(SCR_WIDTH, SCR_HEIGHT, WINDOW_TITLE), m_
 
 	// Register particle shader
 	opengl_wrapper::Shader particleShader;
-	particleShader.loadFromString(particleVertexShaderSource, particleFragmentShaderSource);
+	particleShader.loadFromFile("resources/shaders/particle.vs", "resources/shaders/particle.fs");
 	m_shaderPrograms.insert(std::make_pair(ShaderProgramType::PARTICLE, particleShader));
 
 	// Register background shader
 	opengl_wrapper::Shader backgroundShader;
-	backgroundShader.loadFromString(backgroundVertexShaderSource, backgroundFragmentShaderSource);
+	backgroundShader.loadFromFile("resources/shaders/background.vs", "resources/shaders/background.fs");
 	m_shaderPrograms.insert(std::make_pair(ShaderProgramType::BACKGROUND, backgroundShader));
 
 	// Game variables
