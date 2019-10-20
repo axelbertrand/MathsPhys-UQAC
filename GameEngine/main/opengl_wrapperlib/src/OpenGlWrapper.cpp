@@ -1,4 +1,4 @@
-#include "../include/OpenGlWrapper.hpp"
+#include "../include/openGlWrapper.hpp"
 
 #include <cassert>
 #include <iostream>
